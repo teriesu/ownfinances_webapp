@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/codemirror.min.css"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('login.static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Registro</h1>
+        
+        <form method="POST" action="/signup">
+            {{ form.csrf_token }}
+            {{ form.username.label(class="form-control-label") }} 
+            {{ form.username(class="form-control") }}
+            <br>
+            {{ form.password.label(class="form-control-label") }} 
+            {{ form.password(class="form-control") }}
+            <br>
+            {{ form.confirm_password.label(class="form-control-label") }} 
+            {{ form.confirm_password(class="form-control") }}
+            
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-warning">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <br>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+    </div>
+    
+</body>
+</html>

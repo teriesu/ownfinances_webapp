@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/codemirror.min.css"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('login.static', filename='css/style.css') }}">
+</head>
+<body>
+    {% include 'basenavbar.html' %}
+    <div class="container">
+        <h1>Iniciar sesión</h1>
+        <br>
+        <form method="POST" action="/">
+            {{ form.csrf_token }}
+            {{ form.user.label(class="form-control-label") }} 
+            {{ form.user(class="form-control form-control-lg") }}
+            <br>
+            {{ form.passw.label(class="form-control-label") }} 
+            {{ form.passw(class="form-control form-control-lg") }}
+            <br>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-warning">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+    </div>
+</body>
+
+</html>

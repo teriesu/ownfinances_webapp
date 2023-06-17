@@ -1,0 +1,33 @@
+body {
+    background-color: white;
+    font-family: "Century Gothic", CenturyGothic, AppleGothic, sans-serif;
+}
+.form-control-label {
+    font-weight: bold;
+    color: #16173B;
+}
+.form-control {
+    color: #16173B;
+    border-color: #2faa5d;
+}
+.btn {
+    border: 0;
+    background-color: #2faa5d;
+    color: white;
+    font-weight: bold;
+}
+.btn:hover{
+    background-color: #45f788;
+}
+.container {
+    padding-top: 100px;
+    max-width: 800px;  /* Controla el ancho del formulario */
+    margin: auto;  /* Centra el formulario en la página */
+}
+.navbar {
+    color: white;
+    background-color: #16173B;
+}
+a {
+    color: #45A6F7; /* Cambia el valor a tu color deseado */
+}
