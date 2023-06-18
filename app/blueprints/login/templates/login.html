@@ -7,7 +7,8 @@
     <title>{{title}}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/codemirror.min.css"/>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ url_for('login.static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato&display=swap">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     {% include 'basenavbar.html' %}
@@ -22,16 +23,16 @@
             {{ form.passw.label(class="form-control-label") }} 
             {{ form.passw(class="form-control form-control-lg") }}
             <br>
-            {% with messages = get_flashed_messages() %}
+            {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
-                    {% for message in messages %}
-                    <div class="alert alert-warning">
-                        {{ message }}
-                    </div>
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
                     {% endfor %}
                 {% endif %}
-            {% endwith %}
-            <button type="submit" class="btn btn-primary">Guardar</button>
+            {% endwith %}            
+            <button type="submit" class="btn btn-primary">Ingresar</button>
         </form>
     </div>
 </body>
