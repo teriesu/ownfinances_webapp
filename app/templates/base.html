@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/codemirror.min.css"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato&display=swap">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  </head>
+  <body>
+    <header>
+        {% include 'navbar.html' %}
+    </header>
+
+    {% block content %}
+    <!-- Este bloque se rellena con el contenido de las plantillas que extienden a esta -->
+    {% endblock %}
+
+    <footer>
+      <!-- Y aquí podría ir un pie de página global -->
+    </footer>
+  </body>
+</html>

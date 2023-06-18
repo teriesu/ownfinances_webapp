@@ -27,13 +27,21 @@ csp = {
         'fonts.googleapis.com', 
         'fonts.gstatic.com'
     ],
-    'style-src': [  # se añade esta línea
+    'style-src': [  
         '\'self\'',
         'fonts.googleapis.com', 
         'fonts.gstatic.com',
         'cdnjs.cloudflare.com',
         'stackpath.bootstrapcdn.com',
         '\'unsafe-inline\''  # se permite estilos en línea
+    ],
+    'script-src': [  # se añade esta línea
+        '\'self\'',
+        'cdnjs.cloudflare.com',
+        'stackpath.bootstrapcdn.com',
+        'https://unpkg.com',  # se permite scripts desde unpkg.com
+        'cdn.jsdelivr.net/',
+        '\'unsafe-inline\''  # se permite scripts inline
     ]
 }
 
@@ -47,11 +55,11 @@ def create_app():
 
     #Proteccián cfr
     app.secret_key = secret_key #llave secreta
-    app.config['SECURITY_ENABLED'] = True
+    app.config['SECURITY_ENABLED'] = SECURITY_ENABLED
     app.config["SECURITY_CSRF_COOKIE_NAME"] = SECURITY_CSRF_COOKIE_NAME #nombre de la cookie de seguridad
     app.config["WTF_CSRF_TIME_LIMIT"] = WTF_CSRF_TIME_LIMIT #Tiempo de validez de la cookie
     app.config["SECURITY_CSRF_IGNORE_UNAUTH_ENDPOINTS"] = SECURITY_CSRF_IGNORE_UNAUTH_ENDPOINTS #Endponts sin seguridad
-    app.config["SECURITY_CSRF_PROTECT_MECHANISMS"] = ["session", "basic", "token"]
+    app.config["SECURITY_CSRF_PROTECT_MECHANISMS"] = SECURITY_CSRF_PROTECT_MECHANISMS
     csrf = CSRFProtect(app)
     
     # Habilitamos el control de sesiones
@@ -99,5 +107,8 @@ def create_app():
 
     from app.blueprints.resume import resume
     app.register_blueprint(resume)
+
+    from app.blueprints.wastes import wastes
+    app.register_blueprint(wastes)
 
     return app

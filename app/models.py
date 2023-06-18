@@ -83,6 +83,9 @@ class Gastos(db.Model):
     fecha = db.Column(db.Date(), nullable=False)
     categoria = db.Column(db.Integer, db.ForeignKey(CategoriaGasto.categoria_id), nullable=False)
 
+    #Relaciones
+    categoria_rel = db.relationship('CategoriaGasto', backref=db.backref('categoria_gasto', lazy=True))
+
     def __init__(self, description, monto, fecha, categoria):
         self.description = description
         self.monto = monto

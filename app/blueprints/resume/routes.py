@@ -8,9 +8,7 @@ from app.extensions import Session, db, role_required
 from app.extensions import db
 
 
-from app.extensions import limiter, login_manager
-
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from app.extensions import limiter
 
 @resume.route("/", methods = ["GET","POST"])
 @auth_required('session')

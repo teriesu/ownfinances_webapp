@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+{% block content %}
+    <link rel="stylesheet" href="{{ url_for('wastes.static', filename='css/style.css') }}">
+    <div class = head-container>
+        <h1>Resumen de gastos</h1>
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label for="start-date" class="form-control-label">Fecha inicial:</label>
+                    <input type="date" id="start-date" name="start-date" class="form-control">
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="end-date" class="form-control-label">Fecha final:</label>
+                    <input type="date" id="end-date" name="end-date" class="form-control">
+                </div>
+            </div>
+        </div>
+    
+    <div class="row">
+        <div class="col">
+            <div id="my-table"></div>
+        </div>
+        <div class="col">
+            <canvas id="myChart" width="400" height="400"></canvas>
+        </div>
+    </div>
+</div>
+
+    <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Limpie el contenedor antes de volver a renderizar la tabla
+            const container = document.getElementById('my-table');
+            container.innerHTML = '';
+
+            let grid = new gridjs.Grid({
+                columns: [
+                {id:'Id', name:'Id', sort: true},
+                {id:'Fecha', name:'Fecha', sort: true},
+                {id:'Categoria', name:'Categoría', sort: true},
+                {id:'Monto', name:'Monto', sort: true},
+                {id:'Descripcion', name:'Descripción', sort: false}
+                ],
+                server: {
+                    url: '/wastes/api/table',
+                    then: data => data.map(record => [
+                    record.Id, 
+                    record.Fecha, 
+                    record.Categoria, 
+                    record.Monto, 
+                    record.Descripcion
+                    ])
+                },
+                language:{
+                    'pagination': {
+                        'previous': '<',
+                        'next' :'>',
+                        'showing': 'Mostrando',
+                        'results':'resultados',
+                        'to':'a',
+                        'of':'de'
+                    }
+                },
+                sort: true,
+                style: {
+                },
+                pagination: {
+                    enabled: true,
+                    limit: 10
+                },
+                className: {
+                    table: 'table table-striped', // clases de Bootstrap para la tabla
+                    th: 'thead-dark', // clase de Bootstrap para los encabezados de la tabla
+                    td: 'align-middle', // clase de Bootstrap para las celdas de la tabla
+                    container: 'container mt-5', // clase de Bootstrap para el contenedor de la tabla
+                  },
+            }).render(document.getElementById('my-table'));
+            // Agregue un evento de escucha 'change' a las entradas de fecha para actualizar la tabla
+            
+            function updateGrid() {
+                const startDate = document.getElementById('start-date').value;
+                const endDate = document.getElementById('end-date').value;
+                let url = '/wastes/api/table';
+            
+                if (startDate || endDate) {
+                    const params = new URLSearchParams();
+                    if (startDate) params.set('startDate', startDate);
+                    if (endDate) params.set('endDate', endDate);
+                    url += `?${params.toString()}`;
+                }
+
+                grid.destroy();
+
+                grid = new gridjs.Grid({
+                    columns: [
+                    {id:'Id', name:'Id', sort: true},
+                    {id:'Fecha', name:'Fecha', sort: true},
+                    {id:'Categoria', name:'Categoría', sort: true},
+                    {id:'Monto', name:'Monto', sort: true},
+                    {id:'Descripcion', name:'Descripción', sort: false}
+                    ],
+                    server: {
+                        url: url,
+                        then: data => data.map(record => [
+                        record.Id, 
+                        record.Fecha, 
+                        record.Categoria, 
+                        record.Monto, 
+                        record.Descripcion
+                        ])
+                    },
+                    language:{
+                        'search': {
+                            'placeholder': 'Labor, Lote o Bloque'
+                        },
+                        'pagination': {
+                            'previous': '<',
+                            'next' :'>',
+                            'showing': 'Mostrando',
+                            'results':'resultados',
+                            'to':'a',
+                            'of':'de'
+                        }
+                    },
+                    sort: true,
+                    style: {
+                    },
+                    pagination: {
+                        enabled: true,
+                        limit: 10
+                    },
+                    className: {
+                        table: 'table table-striped', // clases de Bootstrap para la tabla
+                        th: 'thead-dark', // clase de Bootstrap para los encabezados de la tabla
+                        td: 'align-middle', // clase de Bootstrap para las celdas de la tabla
+                        container: 'container mt-5', // clase de Bootstrap para el contenedor de la tabla
+                      },
+                }).render(document.getElementById('my-table'));
+            }
+            grid.render(container);
+            document.getElementById('start-date').addEventListener('change', updateGrid);
+            document.getElementById('end-date').addEventListener('change', updateGrid);
+
+            fetch('api/graph?startDate=2023-01-01&endDate=2023-12-31')
+            .then(response => response.json())
+            .then(data => {
+                // Aquí puedes usar los datos para crear la gráfica
+                const labels = data.map(item => item.Categoria);
+                const data_values = data.map(item => item.Monto);
+
+                // Usando Chart.js para crear la gráfica
+                const ctx = document.getElementById('myChart').getContext('2d');
+                const chart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data_values,
+                            backgroundColor: [  // Puedes ajustar los colores aquí
+                            'rgba(255, 99, 132)',
+                            'rgba(54, 162, 235)',
+                            'rgba(255, 206, 86)',
+                            'rgba(75, 192, 192)',
+                            'rgba(153, 102, 255)',
+                            'rgba(255, 159, 64)'
+                        ],
+                        borderColor: [  // Y aquí también
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                        }]
+                    },
+                });
+            })
+            .catch(error => console.error('Error:', error));
+
+            
+        });
+    </script>
+    <script>
+        // Función para obtener la fecha actual en formato yyyy-mm-dd
+        function getCurrentDate() {
+            const currentDate = new Date();
+            const year = currentDate.getFullYear();
+            const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+            const day = String(currentDate.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        // Función para obtener el primer día del mes actual en formato yyyy-mm-dd
+        function getFirstDayOfMonth() {
+            const currentDate = new Date();
+            const year = currentDate.getFullYear();
+            const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+            return `${year}-${month}-01`;
+        }
+
+        // Establecer las fechas predeterminadas para los campos de fecha
+        document.getElementById('end-date').value = getCurrentDate();
+        // Establecer las fechas predeterminadas para los campos de fecha
+        document.getElementById('start-date').value = getFirstDayOfMonth();
+    </script>
+    
+{% endblock %}
