@@ -57,6 +57,7 @@ class Users(db.Model, UserMixin):
         return str(self.id)
 
 class CategoriaGasto(db.Model):
+
     __tablename__ = 'categoria_gasto'
 
     categoria_id = db.Column(db.Integer, autoincrement=True ,primary_key=True)
@@ -75,6 +76,7 @@ class CategoriaGasto(db.Model):
         }
 
 class Gastos(db.Model):
+
     __tablename__ = 'gastos'
 
     gasto_id = db.Column(db.Integer, autoincrement=True ,primary_key=True)
@@ -102,3 +104,35 @@ class Gastos(db.Model):
             'fecha': self.fecha,
             'categoria': self.categoria
         }
+
+class CategoriaInversion(db.Model):
+
+    __tablename__ = 'categoria_inversion'
+
+    categoria_inv_id = db.Column(db.Integer, autoincrement=True ,primary_key=True)
+    categoria_inv = db.Column(db.Text, nullable=False)
+
+    def __init__(self, categoria_inv):
+        self.categoria_inv = categoria_inv
+    
+    def __repr__(self):
+        return f'{self.categoria_inv_id, self.categoria_inv}'
+    
+    def to_dict(self):
+        return {
+            'categoria_inv_id': self.categoria_inv_id,
+            'categoria_inv': self.categoria_inv
+        }
+
+class Inversion(db.Model):
+    __tablename__ = 'inversion'
+
+    inversion_id = db.Column(db.Integer, autoincrement=True ,primary_key=True)
+    description = db.Column(db.Text, nullable=False)
+    monto = db.Column(db.Integer, nullable=False)
+    rentab_esperada = db.Column(db.Float, nullable=False)
+    fecha = db.Column(db.Date(), nullable=False)
+    categoria = db.Column(db.Integer, db.ForeignKey(CategoriaInversion.categoria_inv_id), nullable=False)
+
+    #Relaciones
+    categoria_rel = db.relationship('CategoriaInversion', backref=db.backref('categoria_inversion', lazy=True))

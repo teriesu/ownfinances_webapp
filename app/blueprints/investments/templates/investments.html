@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-    <link rel="stylesheet" href="{{ url_for('wastes.static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('investments.static', filename='css/style.css') }}">
     <div class = head-container>
         <h1>Resumen de gastos</h1>
         <div class="row">
@@ -44,7 +44,7 @@
                 {id:'Descripcion', name:'Descripción', sort: false}
                 ],
                 server: {
-                    url: '/wastes/api/table',
+                    url: '/investments/api/table',
                     then: data => data.map(record => [
                     record.Id, 
                     record.Fecha, 
@@ -82,7 +82,7 @@
             function updateGrid() {
                 const startDate = document.getElementById('start-date').value;
                 const endDate = document.getElementById('end-date').value;
-                let url = '/wastes/api/table';
+                let url = '/investments/api/table';
             
                 if (startDate || endDate) {
                     const params = new URLSearchParams();

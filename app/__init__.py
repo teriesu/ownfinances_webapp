@@ -6,11 +6,6 @@ from credentials import *
 from .extensions import db, limiter, login_manager
 from flask import Flask
 from flask_talisman import Talisman
-from app.models import(
-    Users,
-    Role
-)
-
 import datetime
 migrate = Migrate()
 
@@ -110,5 +105,8 @@ def create_app():
 
     from app.blueprints.wastes import wastes
     app.register_blueprint(wastes)
+
+    from app.blueprints.investments import investments
+    app.register_blueprint(investments)
 
     return app
