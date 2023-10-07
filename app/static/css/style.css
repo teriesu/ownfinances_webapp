@@ -19,11 +19,14 @@ body {
 .btn:hover{
     background-color: #45f788;
 }
-.container {
-    padding-top: 100px;
-    max-width: 800px;  /* Controla el ancho del formulario */
-    margin: auto;  /* Centra el formulario en la página */
+.my-btn{
+    width: 70%;
 }
+/* .container {
+    padding-top: 100px;
+    max-width: 800px;
+    margin: auto;
+} */
 .navbar {
     color: white;
     background-color: #16173B;

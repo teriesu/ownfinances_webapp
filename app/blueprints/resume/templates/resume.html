@@ -1,5 +1,30 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Bienvenido a Mi Página</h1>
-<p>Esta es mi página.</p>
+<br><br>
+<div class="container text-center">
+    <h1>Manipulación de formatos</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <hr><br>
+    <div class="d-grid gap-2">
+        <div>
+            <a href="/resume/actualize_db" class="btn btn-primary my-btn">Actualizar información</a>
+        </div>
+        <br>
+        <div>
+            <a href="/#" class="btn btn-primary my-btn">Actualizar formatos</a>
+        </div>
+        <br>
+        <div>
+            <a href="/#" class="btn btn-primary my-btn">Generar formatos</a>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -136,3 +136,41 @@ class Inversion(db.Model):
 
     #Relaciones
     categoria_rel = db.relationship('CategoriaInversion', backref=db.backref('categoria_inversion', lazy=True))
+
+class Medios_de_pago(db.Model):
+    __tablename__ = 'medios_de_pago'
+
+    medio_pago_id = db.Column(db.Integer, autoincrement=True ,primary_key=True)
+    medio_pago = db.Column(db.Text, nullable=False)
+
+    def __init__(self, medio_pago):
+        self.medio_pago = medio_pago
+
+    def __repr__(self):
+        return f'{self.medio_pago_id, self.medio_pago}'
+    
+    def to_dict(self):
+        return {
+            'medio_pago_id': self.medio_pago_id,
+            'medio_pago': self.medio_pago
+        }
+
+class Historical_money(db.Model):
+    __tablename__ = 'historical_money'
+
+    histórico_id = db.Column(db.Integer, autoincrement=True ,primary_key=True)
+    fecha = fecha = db.Column(db.Date(), nullable=False)
+    patrimonio = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, fecha, patrimonio):
+        self.fecha = fecha
+        self.patrimonio = patrimonio
+
+    def __repr__(self):
+        return f'{self.fecha, self.patrimonio}'
+    
+    def to_dict(self):
+        return {
+            'fecha': self.fecha,
+            'patrimonio': self.patrimonio
+        }

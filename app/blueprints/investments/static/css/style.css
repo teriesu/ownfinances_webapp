@@ -8,13 +8,17 @@
     border-top: 1px solid #45A7F7;
     text-align: center;
     /* background-color: purple !important; */
-    color: #45a6f7;
-}
-
-.gridjs-table th {
-    text-align: center;
-    /* background-color: #45f788; */
     color: #16173B;
+}
+.gridjs-thead{
+    background-color: #2faa5d !important;
+    color: #16173B !important;
+}
+.table td{
+    border-top: 1px solid #2faa5d !important;
+}
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(74, 225, 216,.1);
 }
 
 .head-container{
