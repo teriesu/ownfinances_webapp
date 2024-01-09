@@ -25,12 +25,14 @@ def login_app():
 # @limiter.limit('1/minute')
 def actualize_info():
     drive = Gdrive()
-    inserts.actualize_db(drive.get_columns_as_dict('Registro movimientos', 'Listas'))
-
-    result_wastes = inserts.save_wastes(drive.read_sheet_as_dataframe('Registro movimientos', 'Compras-Gastos'))
-
-    # print(drive.read_sheet_as_dataframe('Registro movimientos', 'Inversiones'))
-    # print(drive.read_sheet_as_dataframe('Registro movimientos', 'Ingresos'))
-    flash('Funciona perras', 'success')
+    nombre_archivo = 'Registro movimientos'
+    inserts.actualize_db(drive.get_columns_as_dict(nombre_archivo, 'Listas'))
+    file_id = drive.get_file_id(nombre_archivo)
+    # result_incomings = inserts.save_incomings(drive.read_sheet_as_dataframe(nombre_archivo, 'Ingresos'), file_id, 'Ingresos')
+    # result_wastes = inserts.save_wastes(drive.read_sheet_as_dataframe(nombre_archivo, 'Compras-Gastos'), file_id, 'Compras-Gastos')
+    # flash(result_wastes[0], result_wastes[1])
+    result_investments = inserts.save_investments(drive.read_sheet_as_dataframe(nombre_archivo, 'Inversiones'), file_id, 'Inversiones')
+    
+    
 
     return redirect('/resume')

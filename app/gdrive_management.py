@@ -138,10 +138,20 @@ class Gdrive:
         # Obtiene los valores desde el resultado
         values = result.get('values', [])
         
+        if not values:
+            return pd.DataFrame()  # Retorna un DataFrame vacío si no hay datos
+        
+        # Asegúrate de que todas las filas tengan la misma longitud
+        num_columns = len(values[0])
+        for row in values[1:]:
+            while len(row) < num_columns:
+                row.append('')  # Agrega valores vacíos para filas cortas
+
         # Convierte los valores en un DataFrame de pandas
         df = pd.DataFrame(values[1:], columns=values[0])
         
         return df
+
     
     def get_columns_as_dict(self, file_name, sheet_name):
         df = self.read_sheet_as_dataframe(file_name, sheet_name)
@@ -154,7 +164,6 @@ class Gdrive:
             column_dict[key] = [v for v in value if pd.notna(v)]
 
         return column_dict
-
 
 if __name__ == '__main__':
     gdrive = Gdrive()

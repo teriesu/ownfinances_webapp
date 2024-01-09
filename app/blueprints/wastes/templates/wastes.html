@@ -30,154 +30,143 @@
     <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Limpie el contenedor antes de volver a renderizar la tabla
-            const container = document.getElementById('my-table');
-            container.innerHTML = '';
+        function formatCurrency(value) {
+            return "$" + value.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,').replace(/\./g, 'X').replace(/,/g, '.').replace(/X/g, ',');
+        }
 
-            let grid = new gridjs.Grid({
-                columns: [
-                {id:'Id', name:'Id', sort: true, hidden: true},
-                {id:'Fecha', name:'Fecha', sort: true},
-                {id:'Categoria', name:'Categoría', sort: true},
-                {id:'Monto', name:'Monto', sort: true},
-                {id:'Descripcion', name:'Descripción', sort: false}
-                ],
-                server: {
-                    url: '/wastes/api/table',
-                    then: data => data.map(record => [
-                    record.Id, 
-                    record.Fecha, 
-                    record.Categoria, 
-                    record.Monto, 
-                    record.Descripcion
-                    ])
-                },
-                language:{
-                    'pagination': {
-                        'previous': '<',
-                        'next' :'>',
-                        'showing': 'Mostrando',
-                        'results':'resultados',
-                        'to':'a',
-                        'of':'de'
-                    }
-                },
+        let myDoughnutChartInstance; // Variable global para mantener la referencia al gráfico
+
+        function updateChartData(data) {
+            const labels = data.map(item => item.Categoria);
+            const data_values = data.map(item => item.Monto);
+
+            const chartData = {
+                labels: labels,
+                datasets: [{
+                    data: data_values,
+                    backgroundColor: [
+                        'rgba(69, 166, 247, .7)',
+                        'rgba(74, 225, 216, .7)',
+                        'rgba(69, 247, 136, .7)',
+                        'rgba(129, 247, 94, .7)',
+                        'rgba(22, 23, 59, .7)',
+                    ],
+                    borderColor: [
+                        'rgba(69, 166, 247, 1)',
+                        'rgba(74, 225, 216, 1)',
+                        'rgba(69, 247, 136, 1)',
+                        'rgba(129, 247, 94, 1)',
+                        'rgba(22, 23, 59, 1)',
+                    ],
+                    borderWidth: 1
+                }]
+            };
+
+            const config = {
+                type: 'doughnut',
+                data: chartData
+            };
+
+            if (!myDoughnutChartInstance) {
+                // Si no existe una instancia del gráfico, crea una nueva
+                // const ctx = document.getElementById('myChart').getContext('2d');
+                myDoughnutChartInstance = new Chart(document.getElementById('myChart'), config);
+                // myDoughnutChartInstance = new Chart(ctx, config);
+            } else {
+                // Si el gráfico ya existe, actualiza sus datos
+                myDoughnutChartInstance.data = chartData;
+                myDoughnutChartInstance.options = config.options;
+                myDoughnutChartInstance.update();
+            }
+
+            // Calcular total
+            // const totalMonto = data_values.reduce((sum, current) => sum + current, 0);
+
+            // Actualizar la tarjeta con el total
+            // document.getElementById('totalMonto').textContent = formatCurrency(totalMonto);
+        }
+
+
+        let gridInstance = null;
+        function updateTable(data) {
+            const tableContainer = document.getElementById("my-table");
+        
+            // Vaciar el contenedor antes de renderizar la nueva tabla
+            tableContainer.innerHTML = '';
+        
+            // Convertir los datos para la tabla
+            const tableData = data.map(item => [
+                item.Id, 
+                item.Fecha, 
+                item.Categoria, 
+                item.Monto, 
+                item.Descripcion
+            ]); 
+    
+            // Configuración de la tabla
+            const gridConfig = {
+                data: tableData,
+                search: false,
                 sort: true,
-                style: {
-                },
-                pagination: {
-                    enabled: true,
-                    limit: 10
-                },
+                columns: [
+                    {id:'Id', name:'Id', sort: true, hidden: true},
+                    {id:'Fecha', name:'Fecha', sort: true},
+                    {id:'Categoria', name:'Categoría', sort: true},
+                    {id:'Monto', name:'Monto', sort: true},
+                    {id:'Descripcion', name:'Descripción', sort: false} 
+                ],
                 className: {
                     table: 'table table-striped', // clases de Bootstrap para la tabla
                     th: 'thead-dark', // clase de Bootstrap para los encabezados de la tabla
                     td: 'align-middle', // clase de Bootstrap para las celdas de la tabla
                     container: 'container mt-5', // clase de Bootstrap para el contenedor de la tabla
-                  },
-            }).render(document.getElementById('my-table'));
-            // Agregue un evento de escucha 'change' a las entradas de fecha para actualizar la tabla
-            
-            function updateGrid() {
-                const startDate = document.getElementById('start-date').value;
-                const endDate = document.getElementById('end-date').value;
-                let url = '/wastes/api/table';
-            
-                if (startDate || endDate) {
-                    const params = new URLSearchParams();
-                    if (startDate) params.set('startDate', startDate);
-                    if (endDate) params.set('endDate', endDate);
-                    url += `?${params.toString()}`;
-                }
-
-                grid.destroy();
-
-                grid = new gridjs.Grid({
-                    columns: [
-                    {id:'Id', name:'Id', sort: true},
-                    {id:'Fecha', name:'Fecha', sort: true},
-                    {id:'Categoria', name:'Categoría', sort: true},
-                    {id:'Monto', name:'Monto', sort: true},
-                    {id:'Descripcion', name:'Descripción', sort: false}
-                    ],
-                    server: {
-                        url: url,
-                        then: data => data.map(record => [
-                        record.Id, 
-                        record.Fecha, 
-                        record.Categoria, 
-                        record.Monto, 
-                        record.Descripcion
-                        ])
                     },
-                    language:{
-                        'search': {
-                            'placeholder': 'Labor, Lote o Bloque'
-                        },
-                        'pagination': {
-                            'previous': '<',
-                            'next' :'>',
-                            'showing': 'Mostrando',
-                            'results':'resultados',
-                            'to':'a',
-                            'of':'de'
-                        }
-                    },
-                    sort: true,
-                    style: {
-                    },
-                    pagination: {
-                        enabled: true,
-                        limit: 10
-                    },
-                    className: {
-                        table: 'table table-striped', // clases de Bootstrap para la tabla
-                        th: 'thead-dark', // clase de Bootstrap para los encabezados de la tabla
-                        td: 'align-middle', // clase de Bootstrap para las celdas de la tabla
-                        container: 'container mt-5', // clase de Bootstrap para el contenedor de la tabla
-                      },
-                }).render(document.getElementById('my-table'));
+            };
+        
+            if (window.gridInstance) {
+                // Si la instancia ya existe, simplemente actualiza los datos
+                window.gridInstance.updateConfig(gridConfig).forceRender();
+            } else {
+                // Si la instancia no existe, crear una nueva y asignarla a window.gridInstance
+                window.gridInstance = new gridjs.Grid(gridConfig).render(tableContainer);
             }
-            grid.render(container);
-            document.getElementById('start-date').addEventListener('change', updateGrid);
-            document.getElementById('end-date').addEventListener('change', updateGrid);
+        
+        }
 
-            fetch('api/graph?startDate=2023-01-01&endDate=2023-12-31')
-            .then(response => response.json())
-            .then(data => {
-                // Aquí puedes usar los datos para crear la gráfica
-                const labels = data.map(item => item.Categoria);
-                const data_values = data.map(item => item.Monto);
-                // Usando Chart.js para crear la gráfica
-                const ctx = document.getElementById('myChart').getContext('2d');
-                const chart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: data_values,
-                            backgroundColor: [  // Ajusta los colores aquí
-                                'rgba(69, 166, 247, .7)',  // #45A6F7
-                                'rgba(74, 225, 216, .7)',  // #4AE1D8
-                                'rgba(69, 247, 136, .7)',  // #45F788
-                                'rgba(129, 247, 94, .7)',  // #81F75E
-                                'rgba(22, 23, 59, .7)',  // #16173B
-                            ],
-                            borderColor: [  // Y aquí también
-                                'rgba(69, 166, 247, 1)',  // #45A6F7
-                                'rgba(74, 225, 216, 1)',  // #4AE1D8
-                                'rgba(69, 247, 136, 1)',  // #45F788
-                                'rgba(129, 247, 94, 1)',  // #81F75E
-                                'rgba(22, 23, 59, 1)',  // #16173B
-                            ],
-                            borderWidth: 1
-                        }]
-                    },
-                });
-            })
-            .catch(error => console.error('Error:', error));
-        });
+        function updateTableChart() {
+            const startDateElement = document.getElementById('start-date');
+            const endDateElement = document.getElementById('end-date');
+    
+            const startDate = startDateElement ? startDateElement.value : null;
+            const endDate = endDateElement ? endDateElement.value : null;
+    
+            let url = '/wastes/api/table';
+            let params = new URLSearchParams();
+    
+            // if (selectedAreas && selectedAreas.length > 0) {
+            //    params.append('areas', selectedAreas.join(',')); // Asumiendo que el backend acepta una lista de áreas separadas por comas
+            // }
+            if (startDate) {
+                params.append('startDate', startDate);
+            }
+            if (endDate) {
+                params.append('endDate', endDate);
+            }    
+    
+            fetch(`${url}?${params.toString()}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Actualiza tu gráfico con los nuevos datos
+                    updateChartData(data);
+                    updateTable(data);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        updateTableChart();
+        
+        document.getElementById('start-date').addEventListener('change', updateTableChart);
+        document.getElementById('end-date').addEventListener('change', updateTableChart);
     </script>
     <script>
         // Función para obtener la fecha actual en formato yyyy-mm-dd

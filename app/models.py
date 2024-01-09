@@ -75,6 +75,28 @@ class CategoriaGasto(db.Model):
             'categoria': self.categoria
         }
 
+class Bienes(db.Model):
+    __tablename__ = 'bienes'
+
+    bien_id = db.Column(db.Integer, autoincrement=True ,primary_key=True)
+    description = db.Column(db.Text, nullable=False)
+    valor_inicial = db.Column(db.Integer, nullable=False)
+    valor_venta = db.Column(db.Integer, nullable=True)
+
+
+    def __init__(self, description, valor_inicial):
+        self.description = description
+        self.valor_inicial = valor_inicial
+    
+    def __repr__(self):
+        return f'{self.description, self.valor_inicial}'
+    
+    def to_dict(self):
+        return {
+            'description': self.description,
+            'valor_inicial': self.valor_inicial
+        }
+
 class Gastos(db.Model):
 
     __tablename__ = 'gastos'
@@ -84,25 +106,38 @@ class Gastos(db.Model):
     monto = db.Column(db.Integer, nullable=False)
     fecha = db.Column(db.Date(), nullable=False)
     categoria = db.Column(db.Integer, db.ForeignKey(CategoriaGasto.categoria_id), nullable=False)
+    hash_formato = db.Column(db.Text, nullable=True)
+    id_df_formato = db.Column(db.Integer, nullable=True)
+    id_patrimonio = db.Column(db.Integer, db.ForeignKey(Bienes.bien_id), nullable=True)
+    essential = db.Column(db.Boolean, nullable=False)
 
     #Relaciones
     categoria_rel = db.relationship('CategoriaGasto', backref=db.backref('categoria_gasto', lazy=True))
+    bien_rel = db.relationship('Bienes', backref=db.backref('gastos_bienes', lazy=True))
 
-    def __init__(self, description, monto, fecha, categoria):
+    def __init__(self, description, monto, fecha, categoria, hash_formato, id_df_formato, id_patrimonio, essential):
         self.description = description
         self.monto = monto
         self.fecha = fecha
         self.categoria = categoria
+        self.hash_formato = hash_formato
+        self.id_df_formato = id_df_formato
+        self.id_patrimonio = id_patrimonio
+        self.essential = essential
 
     def __repr__(self):
-        return f'{self.description, self.monto, self.fecha, self.categoria}'
+        return f'{self.description, self.monto, self.fecha, self.categoria, self.hash_formato, self.id_df_formato, self.id_patrimonio, self.essential}'
     
     def to_dict(self):
         return {
             'description': self.description,
             'monto': self.monto,
             'fecha': self.fecha,
-            'categoria': self.categoria
+            'categoria': self.categoria,
+            'hash_formato': self.hash_formato,
+            'id_df_formato': self.id_df_formato,
+            'id_patrimonio': self.id_patrimonio,
+            'essential': self.essential
         }
 
 class CategoriaInversion(db.Model):
@@ -133,6 +168,8 @@ class Inversion(db.Model):
     rentab_esperada = db.Column(db.Float, nullable=False)
     fecha = db.Column(db.Date(), nullable=False)
     categoria = db.Column(db.Integer, db.ForeignKey(CategoriaInversion.categoria_inv_id), nullable=False)
+    hash_formato = db.Column(db.Text, nullable=True)
+    id_df_formato = db.Column(db.Integer, nullable=True)
 
     #Relaciones
     categoria_rel = db.relationship('CategoriaInversion', backref=db.backref('categoria_inversion', lazy=True))
@@ -158,19 +195,79 @@ class Medios_de_pago(db.Model):
 class Historical_money(db.Model):
     __tablename__ = 'historical_money'
 
-    histórico_id = db.Column(db.Integer, autoincrement=True ,primary_key=True)
-    fecha = fecha = db.Column(db.Date(), nullable=False)
+    historico_id = db.Column(db.Integer, autoincrement=True ,primary_key=True)
+    fecha = fecha = db.Column(db.DateTime, nullable=False)
     patrimonio = db.Column(db.Integer, nullable=False)
+    liquidez = db.Column(db.Integer, nullable=False)
+    description = db.Column(db.Text, nullable=True)
 
-    def __init__(self, fecha, patrimonio):
+    def __init__(self, fecha, patrimonio, liquidez, description):
         self.fecha = fecha
         self.patrimonio = patrimonio
+        self.liquidez = liquidez
+        self.description = description
 
     def __repr__(self):
-        return f'{self.fecha, self.patrimonio}'
+        return f'{self.fecha, self.patrimonio, self.liquidez, self.description}'
     
     def to_dict(self):
         return {
             'fecha': self.fecha,
-            'patrimonio': self.patrimonio
+            'patrimonio': self.patrimonio,
+            'liquidez': self.liquidez,
+            'description': self.description
+        }
+
+class Categoria_ingreso(db.Model):
+    
+        __tablename__ = 'categoria_ingreso'
+    
+        categoria_ingreso_id = db.Column(db.Integer, autoincrement=True ,primary_key=True)
+        categoria_ingreso = db.Column(db.Text, nullable=False)
+    
+        def __init__(self, categoria_ingreso):
+            self.categoria_ingreso = categoria_ingreso
+        
+        def __repr__(self):
+            return f'{self.categoria_ingreso_id, self.categoria_ingreso}'
+        
+        def to_dict(self):
+            return {
+                'categoria_ingreso_id': self.categoria_ingreso_id,
+                'categoria_ingreso': self.categoria_ingreso
+            }
+        
+class Ingresos(db.Model):
+    __tablename__ = 'ingresos'
+
+    ingreso_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    description = db.Column(db.Text, nullable=False)
+    monto = db.Column(db.Integer, nullable=False)
+    fecha = db.Column(db.Date(), nullable=False)
+    categoria = db.Column(db.Integer, db.ForeignKey(Categoria_ingreso.categoria_ingreso_id), nullable=False)
+    hash_formato = db.Column(db.Text, nullable=True)
+    id_df_formato = db.Column(db.Integer, nullable=True)
+    
+    # Relaciones
+    categoria_rel = db.relationship('Categoria_ingreso', backref=db.backref('ingresos', lazy=True))
+    
+    def __init__(self, description, monto, fecha, categoria, hash_formato, id_df_formato):
+        self.description = description
+        self.monto = monto
+        self.fecha = fecha
+        self.categoria = categoria
+        self.hash_formato = hash_formato
+        self.id_df_formato = id_df_formato
+    
+    def __repr__(self):
+        return f'{self.description, self.monto, self.fecha, self.categoria, self.hash_formato, self.id_df_formato}'
+    
+    def to_dict(self):
+        return {
+            'description': self.description,
+            'monto': self.monto,
+            'fecha': self.fecha,
+            'categoria': self.categoria,
+            'hash_formato': self.hash_formato,
+            'id_df_formato': self.id_df_formato
         }
