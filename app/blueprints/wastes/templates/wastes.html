@@ -17,12 +17,20 @@
                 </div>
             </div>
         </div>
+    
     <div class="row">
         <div class="col d-flex justify-content-center">
             <div id="my-table"></div>
         </div>
         <div class="col d-flex justify-content-center align-items-center">
             <canvas id="myChart"></canvas>
+        </div>
+    </div>
+    <br>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Totales</h5>
+            <p class="card-text salario-base-color">Gastos totales: <span id="totalMonto">0</span></p>
         </div>
     </div>
 </div>
@@ -33,13 +41,10 @@
         function formatCurrency(value) {
             return "$" + value.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,').replace(/\./g, 'X').replace(/,/g, '.').replace(/X/g, ',');
         }
-
         let myDoughnutChartInstance; // Variable global para mantener la referencia al gráfico
-
         function updateChartData(data) {
             const labels = data.map(item => item.Categoria);
             const data_values = data.map(item => item.Monto);
-
             const chartData = {
                 labels: labels,
                 datasets: [{
@@ -61,48 +66,37 @@
                     borderWidth: 1
                 }]
             };
-
             const config = {
                 type: 'doughnut',
                 data: chartData
             };
-
             if (!myDoughnutChartInstance) {
                 // Si no existe una instancia del gráfico, crea una nueva
-                // const ctx = document.getElementById('myChart').getContext('2d');
                 myDoughnutChartInstance = new Chart(document.getElementById('myChart'), config);
-                // myDoughnutChartInstance = new Chart(ctx, config);
             } else {
-                // Si el gráfico ya existe, actualiza sus datos
                 myDoughnutChartInstance.data = chartData;
                 myDoughnutChartInstance.options = config.options;
                 myDoughnutChartInstance.update();
             }
-
             // Calcular total
-            // const totalMonto = data_values.reduce((sum, current) => sum + current, 0);
-
+            const totalMonto = data_values.reduce((sum, current) => sum + current, 0);
             // Actualizar la tarjeta con el total
-            // document.getElementById('totalMonto').textContent = formatCurrency(totalMonto);
+            document.getElementById('totalMonto').textContent = formatCurrency(totalMonto);
         }
-
 
         let gridInstance = null;
         function updateTable(data) {
             const tableContainer = document.getElementById("my-table");
-        
             // Vaciar el contenedor antes de renderizar la nueva tabla
             tableContainer.innerHTML = '';
-        
             // Convertir los datos para la tabla
             const tableData = data.map(item => [
                 item.Id, 
                 item.Fecha, 
                 item.Categoria, 
-                item.Monto, 
+                formatCurrency(item.Monto), 
                 item.Descripcion
             ]); 
-    
             // Configuración de la tabla
             const gridConfig = {
                 data: tableData,
@@ -122,7 +116,6 @@
                     container: 'container mt-5', // clase de Bootstrap para el contenedor de la tabla
                     },
             };
-        
             if (window.gridInstance) {
                 // Si la instancia ya existe, simplemente actualiza los datos
                 window.gridInstance.updateConfig(gridConfig).forceRender();
@@ -130,7 +123,6 @@
                 // Si la instancia no existe, crear una nueva y asignarla a window.gridInstance
                 window.gridInstance = new gridjs.Grid(gridConfig).render(tableContainer);
             }
-        
         }
 
         function updateTableChart() {

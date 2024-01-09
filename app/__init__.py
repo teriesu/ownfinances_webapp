@@ -36,6 +36,7 @@ csp = {
         'stackpath.bootstrapcdn.com',
         'https://unpkg.com',  # se permite scripts desde unpkg.com
         'cdn.jsdelivr.net/',
+        'code.jquery.com',  # Agrega esta línea para permitir jQuery desde su CDN
         '\'unsafe-inline\''  # se permite scripts inline
     ]
 }

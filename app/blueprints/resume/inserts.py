@@ -9,7 +9,8 @@ from app.models import (
     Ingresos,
     Inversion,
     Categoria_ingreso,
-    CategoriaInversion
+    CategoriaInversion,
+    PlataformasInversion
 )
 from app.general_funcions import *
 from sqlalchemy import (
@@ -27,7 +28,6 @@ def actualize_db(dictionary):
             new_categoria = CategoriaGasto(categoria)
             session.add(new_categoria)
 
-    # Si hay medios de pago faltantes, insertarlos
     if 'Médio de pago' in missing_elements:
         for medio in missing_elements['Médio de pago']:
             new_medio = Medios_de_pago(medio)
@@ -42,6 +42,11 @@ def actualize_db(dictionary):
         for categoria in missing_elements['Categoría Inversión']:
             new_categoria = CategoriaInversion(categoria)
             session.add(new_categoria)
+
+    if 'Plataformas' in missing_elements:
+        for plataforma in missing_elements['Plataformas']:
+            new_plataforma = PlataformasInversion(plataforma)
+            session.add(new_plataforma)
     
     session.commit()
     session.close()
@@ -63,6 +68,8 @@ def update_current_money(patrimonio, liquidez, description):
 def save_incomings(df, file_id, sheet_name):
     session = Session()
     try:
+        if df.empty:
+            return "No hay ingresos nuevos.", 'info'
         df['Monto'] = df['Monto'].apply(convert_currency_to_int)
         df['Categoría'] = df['Categoría'].map(cat_incom_string_to_id())
         _, patrimonio, liquidez = get_current_heritage()
@@ -86,11 +93,11 @@ def save_incomings(df, file_id, sheet_name):
             update_current_money(patrimonio, liquidez, row['Descripción'])
         
         session.commit()
-        return "Datos guardados con éxito.", 'success'
+        return "Ingresos nuevos guardados con éxito.", 'success'
     
     except Exception as e:
         session.rollback()
-        return f"Error al guardar los datos: {e}", 'danger'
+        return f"Error al guardar los ingresos: {e}", 'danger'
 
     finally:
         session.close()
@@ -98,9 +105,11 @@ def save_incomings(df, file_id, sheet_name):
 def save_wastes(df, file_id, sheet_name):
     session = Session()
     try:
+        if df.empty:
+            return "No hay gastos nuevos.", 'info'
         df['Monto'] = df['Monto'].apply(convert_currency_to_int)
-        df['Categoría'] = df['Categoría'].map(cat_wast_string_to_id)
-        df['Médio de pago'] = df['Médio de pago'].map(medio_string_to_id)
+        df['Categoría'] = df['Categoría'].map(cat_wast_string_to_id())
+        df['Médio de pago'] = df['Médio de pago'].map(medio_string_to_id())
 
         _, patrimonio, liquidez = get_current_heritage()
         
@@ -136,32 +145,54 @@ def save_wastes(df, file_id, sheet_name):
             update_current_money(patrimonio, liquidez, row['Descripción'])
 
         session.commit()
-        return "Datos guardados con éxito.", 'success'
+        return "Gastos guardados con éxito.", 'success'
 
     except Exception as e:
         session.rollback()
-        return f"Error al guardar los datos: {e}", 'danger'
+        return f"Error al guardar los gastos: {e}", 'danger'
 
     finally:
         session.close()
 
 def save_investments(df, file_id, sheet_name):
     session = Session()
-    df['Monto'] = df['Monto'].apply(convert_currency_to_int)
-    df['Categoría'] = df['Categoría'].map(cat_invest_string_to_id())
-    _, patrimonio, liquidez = get_current_heritage()
-    last_investment_id = consults.get_last_format_register(file_id, hoja_tabla[sheet_name])
-    start_index = last_investment_id + 1 if last_investment_id is not None else 0
-    iterated = False
-    for index, row in df.iloc[start_index:].iterrows():
-        iterated = True
-        nuevo_inversion = Inversion(
-            description = row['Descripción'],
-            monto = row['Monto'],
-            fecha = row['Fecha'],
-            categoria = row['Categoría'],
-            hash_formato = file_id,
-            id_df_formato = index, 
-        )
-        session.add(nuevo_inversion)
-        liquidez -= row['Monto']
+    
+    try:
+        if df.empty:
+            return "No hay inversiones nuevas.", 'info'
+        
+        df['Monto'] = df['Monto'].apply(convert_currency_to_int)
+        df['Categoría'] = df['Categoría'].map(cat_invest_string_to_id())
+
+        _, patrimonio, liquidez = get_current_heritage()
+        last_investment_id = consults.get_last_format_register(file_id, hoja_tabla[sheet_name])
+        start_index = last_investment_id + 1 if last_investment_id is not None else 0
+
+        iterated = False
+        for index, row in df.iloc[start_index:].iterrows():
+            iterated = True
+            nuevo_inversion = Inversion(
+                description = row['Descripción'], 
+                monto = row['Monto'], 
+                rentab_esperada = row['Rentabilidad Esperada'], 
+                fecha = row['Fecha'], 
+                categoria = row['Categoría'], 
+                hash_formato = file_id, 
+                id_df_formato = index
+            )
+            session.add(nuevo_inversion)
+            patrimonio += row['Monto']
+            liquidez -= row['Monto']
+
+        if iterated:
+            update_current_money(patrimonio, liquidez, row['Descripción'])
+        
+        session.commit()
+        return "Inversiones guardadas con éxito.", 'success'
+
+    except Exception as e:
+        session.rollback()
+        return f"Error al guardar las inversiones: {e}", 'danger'
+
+    finally:
+        session.close()

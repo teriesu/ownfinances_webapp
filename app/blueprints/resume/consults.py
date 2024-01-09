@@ -74,6 +74,21 @@ def check_missing_elements(dictionary):
     if missing_categories_invest:
         missing_elements['Categoría Inversión'] = missing_categories_invest
                                  
+    #Comprobar plataforma inversión
+    platf_invest_values = tuple(dictionary['Plataformas'])
+    consult_categoria_invest = text("""
+        SELECT plataforma
+        FROM plataformas_inversion
+        WHERE plataforma IN :values
+    """)
+    results_categoria_invest = session.execute(consult_categoria_invest, {'values': platf_invest_values}).fetchall()
+    found_categories_invest = [item[0] for item in results_categoria_invest]
+
+    missing_categories_invest = [item for item in platf_invest_values if item not in found_categories_invest]
+    missing_categories_invest = [item for item in missing_categories_invest if item.strip()]
+    
+    if missing_categories_invest:
+        missing_elements['Plataformas'] = missing_categories_invest
 
     session.close()
 

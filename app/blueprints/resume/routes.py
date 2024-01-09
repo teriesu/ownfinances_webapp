@@ -28,11 +28,11 @@ def actualize_info():
     nombre_archivo = 'Registro movimientos'
     inserts.actualize_db(drive.get_columns_as_dict(nombre_archivo, 'Listas'))
     file_id = drive.get_file_id(nombre_archivo)
-    # result_incomings = inserts.save_incomings(drive.read_sheet_as_dataframe(nombre_archivo, 'Ingresos'), file_id, 'Ingresos')
-    # result_wastes = inserts.save_wastes(drive.read_sheet_as_dataframe(nombre_archivo, 'Compras-Gastos'), file_id, 'Compras-Gastos')
-    # flash(result_wastes[0], result_wastes[1])
+    result_wastes = inserts.save_wastes(drive.read_sheet_as_dataframe(nombre_archivo, 'Compras-Gastos'), file_id, 'Compras-Gastos')
+    flash(result_wastes[0], result_wastes[1])
+    result_incomings = inserts.save_incomings(drive.read_sheet_as_dataframe(nombre_archivo, 'Ingresos'), file_id, 'Ingresos')
+    flash(result_incomings[0], result_incomings[1])
     result_investments = inserts.save_investments(drive.read_sheet_as_dataframe(nombre_archivo, 'Inversiones'), file_id, 'Inversiones')
+    flash(result_investments[0], result_investments[1])
     
-    
-
     return redirect('/resume')

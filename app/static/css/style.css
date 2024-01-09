@@ -10,18 +10,26 @@ body {
     color: #16173B;
     border-color: #2faa5d;
 }
-.btn {
+.btn-personal {
     border: 0;
     background-color: #2faa5d;
     color: white;
     font-weight: bold;
 }
-.btn:hover{
+.btn-personal:hover{
     background-color: #45f788;
+
 }
-.my-btn{
-    width: 70%;
+.btn-personal2 {
+    border: 0;
+    background-color: #45A6F7;
+    color: white;
+    font-weight: bold;
 }
+.btn-personal2:hover{
+    background-color: #4792ff;
+}
+
 /* .container {
     padding-top: 100px;
     max-width: 800px;

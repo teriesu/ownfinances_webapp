@@ -159,6 +159,24 @@ class CategoriaInversion(db.Model):
             'categoria_inv': self.categoria_inv
         }
 
+class PlataformasInversion(db.Model):
+    __tablename__ = 'plataformas_inversion'
+
+    plataforma_id = db.Column(db.Integer, autoincrement=True ,primary_key=True)
+    plataforma = db.Column(db.Text, nullable=False)
+
+    def __init__(self, plataforma):
+        self.plataforma = plataforma
+
+    def __repr__(self):
+        return f'{self.plataforma_id, self.plataforma}'
+    
+    def to_dict(self):
+        return {
+            'plataforma_id': self.plataforma_id,
+            'plataforma': self.plataforma
+        }
+
 class Inversion(db.Model):
     __tablename__ = 'inversion'
 
@@ -168,11 +186,38 @@ class Inversion(db.Model):
     rentab_esperada = db.Column(db.Float, nullable=False)
     fecha = db.Column(db.Date(), nullable=False)
     categoria = db.Column(db.Integer, db.ForeignKey(CategoriaInversion.categoria_inv_id), nullable=False)
+    
     hash_formato = db.Column(db.Text, nullable=True)
     id_df_formato = db.Column(db.Integer, nullable=True)
+    cerrada = db.Column(db.Boolean, nullable=True)
 
     #Relaciones
     categoria_rel = db.relationship('CategoriaInversion', backref=db.backref('categoria_inversion', lazy=True))
+
+    def __init__(self, description, monto, rentab_esperada, fecha, categoria, hash_formato, id_df_formato, cerrada = False):
+        self.description = description
+        self.monto = monto
+        self.rentab_esperada = rentab_esperada
+        self.fecha = fecha
+        self.categoria = categoria
+        self.hash_formato = hash_formato
+        self.id_df_formato = id_df_formato
+        self.cerrada = cerrada
+    
+    def __repr__(self):
+        return f'{self.description, self.monto, self.rentab_esperada, self.fecha, self.categoria, self.hash_formato, self.id_df_formato}'
+    
+    def to_dict(self):
+        return {
+            'description': self.description,
+            'monto': self.monto,
+            'rentab_esperada': self.rentab_esperada,
+            'fecha': self.fecha,
+            'categoria': self.categoria,
+            'hash_formato': self.hash_formato,
+            'id_df_formato': self.id_df_formato
+        }
+
 
 class Medios_de_pago(db.Model):
     __tablename__ = 'medios_de_pago'
