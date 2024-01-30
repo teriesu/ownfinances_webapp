@@ -17,7 +17,7 @@
                 </div>
             </div>
         </div>
-    
+
     <div class="row">
         <div class="col d-flex justify-content-center">
             <div id="my-table"></div>
@@ -41,7 +41,31 @@
         function formatCurrency(value) {
             return "$" + value.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,').replace(/\./g, 'X').replace(/,/g, '.').replace(/X/g, ',');
         }
+        
         let myDoughnutChartInstance; // Variable global para mantener la referencia al gráfico
+        // Chart.pluginService.register({
+        //     afterDraw: function(chart) {
+        //         if (chart.config.type == 'doughnut') {
+        //             var width = chart.chart.width,
+        //                 height = chart.chart.height,
+        //                 ctx = chart.chart.ctx;
+
+        //             ctx.restore();
+        //             var fontSize = (height / 100).toFixed(2);
+        //             ctx.font = fontSize + "em sans-serif";
+        //             ctx.textBaseline = "middle";
+
+        //             var total = chart.config.data.datasets[0].data.reduce((sum, value) => sum + value, 0),
+        //                 text = formatCurrency(total),
+        //                 textX = Math.round((width - ctx.measureText(text).width) / 2),
+        //                 textY = height / 2;
+
+        //             ctx.fillText(text, textX, textY);
+        //             ctx.save();
+        //         }
+        // }
+        // });
+        
         function updateChartData(data) {
             const labels = data.map(item => item.Categoria);
             const data_values = data.map(item => item.Monto);
@@ -82,7 +106,10 @@
             const totalMonto = data_values.reduce((sum, current) => sum + current, 0);
             // Actualizar la tarjeta con el total
             document.getElementById('totalMonto').textContent = formatCurrency(totalMonto);
+
         }
+
+        
 
         let gridInstance = null;
         function updateTable(data) {
@@ -91,12 +118,12 @@
             tableContainer.innerHTML = '';
             // Convertir los datos para la tabla
             const tableData = data.map(item => [
-                item.Id, 
-                item.Fecha, 
-                item.Categoria, 
-                formatCurrency(item.Monto), 
+                item.Id,
+                item.Fecha,
+                item.Categoria,
+                formatCurrency(item.Monto),
                 item.Descripcion
-            ]); 
+            ]);
             // Configuración de la tabla
             const gridConfig = {
                 data: tableData,
@@ -107,7 +134,7 @@
                     {id:'Fecha', name:'Fecha', sort: true},
                     {id:'Categoria', name:'Categoría', sort: true},
                     {id:'Monto', name:'Monto', sort: true},
-                    {id:'Descripcion', name:'Descripción', sort: false} 
+                    {id:'Descripcion', name:'Descripción', sort: false}
                 ],
                 className: {
                     table: 'table table-striped', // clases de Bootstrap para la tabla
@@ -128,13 +155,15 @@
         function updateTableChart() {
             const startDateElement = document.getElementById('start-date');
             const endDateElement = document.getElementById('end-date');
-    
+
             const startDate = startDateElement ? startDateElement.value : null;
             const endDate = endDateElement ? endDateElement.value : null;
-    
+
             let url = '/wastes/api/table';
+            let url2 = '/wastes/api/graph';
+
             let params = new URLSearchParams();
-    
+
             // if (selectedAreas && selectedAreas.length > 0) {
             //    params.append('areas', selectedAreas.join(',')); // Asumiendo que el backend acepta una lista de áreas separadas por comas
             // }
@@ -143,20 +172,26 @@
             }
             if (endDate) {
                 params.append('endDate', endDate);
-            }    
-    
+            }
+
             fetch(`${url}?${params.toString()}`)
                 .then(response => response.json())
                 .then(data => {
                     // Actualiza tu gráfico con los nuevos datos
-                    updateChartData(data);
                     updateTable(data);
-                })
-                .catch(error => console.error('Error:', error));
+            }).catch(error => console.error('Error:', error));
+
+            fetch(`${url2}?${params.toString()}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Actualiza tu gráfico con los nuevos datos
+                    updateChartData(data);
+            }).catch(error => console.error('Error:', error));
+
         }
 
         updateTableChart();
-        
+
         document.getElementById('start-date').addEventListener('change', updateTableChart);
         document.getElementById('end-date').addEventListener('change', updateTableChart);
     </script>
@@ -181,5 +216,5 @@
         // Establecer las fechas predeterminadas para los campos de fecha
         document.getElementById('start-date').value = getFirstDayOfMonth();
     </script>
-    
+
 {% endblock %}
