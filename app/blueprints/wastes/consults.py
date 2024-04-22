@@ -4,7 +4,8 @@ from app.models import(
 )
 from sqlalchemy import (
     or_,
-    func
+    func,
+    text
 )
 from datetime import datetime
 from flask import jsonify
@@ -13,18 +14,27 @@ from app.extensions import Session
 
 def get_wastes(fecha_inicial, fecha_final):
     session = Session()
-    results = session.query(
-        Gastos.gasto_id,
-        CategoriaGasto.categoria,
-        Gastos.description,
-        Gastos.monto,
-        Gastos.fecha
-    ).join(
-        CategoriaGasto, Gastos.categoria == CategoriaGasto.categoria_id
-    ).filter(
-        or_(Gastos.fecha >= fecha_inicial if fecha_inicial is not None else None, fecha_inicial is None),
-        or_(Gastos.fecha <= fecha_final if fecha_final is not None else None, fecha_final is None),
-    ).all()
+    results = text("""
+        SELECT 
+            gasto_id, 
+            cg.categoria, 
+            description, 
+            monto, 
+            fecha
+        FROM 
+            gastos g
+        JOIN 
+            categoria_gasto cg ON g.categoria = cg.categoria_id
+        WHERE 
+            g.fecha >= :fecha_inicial OR :fecha_inicial IS NULL
+            AND g.fecha <= :fecha_final OR :fecha_final IS NULL
+        ORDER BY 
+            fecha DESC;
+    """)
+    params = {'fecha_inicial': fecha_inicial,
+                'fecha_final': fecha_final
+              }
+    results = session.execute(results, params).fetchall()
 
     session.close()
 
@@ -40,17 +50,25 @@ def get_wastes(fecha_inicial, fecha_final):
 
 def get_graph(fecha_inicial, fecha_final):
     session = Session()
-    results = session.query(
-        CategoriaGasto.categoria,
-        func.sum(Gastos.monto),
-    ).join(
-        CategoriaGasto, Gastos.categoria == CategoriaGasto.categoria_id
-    ).filter(
-        or_(Gastos.fecha >= fecha_inicial if fecha_inicial is not None else None, fecha_inicial is None),
-        or_(Gastos.fecha <= fecha_final if fecha_final is not None else None, fecha_final is None),
-    ).group_by(
-        CategoriaGasto.categoria
-    ).all()
+    results = text("""
+        SELECT
+            cg.categoria,
+            SUM(g.monto)
+        FROM
+            gastos g
+        JOIN
+            categoria_gasto cg ON g.categoria = cg.categoria_id
+        WHERE
+            g.fecha >= :fecha_inicial OR :fecha_inicial IS NULL
+            AND g.fecha <= :fecha_final OR :fecha_final IS NULL
+        GROUP BY
+            cg.categoria;
+    """)
+    params = {'fecha_inicial': fecha_inicial,
+                'fecha_final': fecha_final
+              }
+    
+    results = session.execute(results, params).fetchall()    
     
     session.close()
 

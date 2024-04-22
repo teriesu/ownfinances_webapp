@@ -15,7 +15,7 @@ import app.blueprints.wastes.consults as Consults
 @limiter.limit('10/minute')
 def wastes_app():    
 
-    return render_template('wastes.html', title = 'Gastos')
+    return render_template('wastes2.html', title = 'Gastos')
 
 @wastes.route("/api/table", methods = ["GET","POST"])
 @auth_required('session')

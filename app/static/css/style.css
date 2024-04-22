@@ -30,15 +30,19 @@ body {
     background-color: #4792ff;
 }
 
-/* .container {
-    padding-top: 100px;
-    max-width: 800px;
-    margin: auto;
-} */
 .navbar {
     color: white;
     background-color: #16173B;
 }
 a {
     color: #45A6F7; /* Cambia el valor a tu color deseado */
+}
+
+.fixed-width-container {
+    width: 100%; /* O un ancho fijo que prefieras */
+    overflow-x: auto; /* Permite desplazamiento horizontal si la tabla es demasiado ancha */
+}
+
+.dataTable {
+    width: 100% !important; /* Fuerza a la tabla a usar el 100% del contenedor */
 }

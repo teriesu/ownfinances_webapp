@@ -15,12 +15,12 @@ csp = {
     'default-src': [
         '\'self\'',
         'cdnjs.cloudflare.com',
-        'stackpath.bootstrapcdn.com'
+        'stackpath.bootstrapcdn.com',
     ],
     'font-src': [
         '\'self\'',
         'fonts.googleapis.com', 
-        'fonts.gstatic.com'
+        'fonts.gstatic.com',
     ],
     'style-src': [  
         '\'self\'',
@@ -28,16 +28,22 @@ csp = {
         'fonts.gstatic.com',
         'cdnjs.cloudflare.com',
         'stackpath.bootstrapcdn.com',
-        '\'unsafe-inline\''  # se permite estilos en línea
+        'cdn.datatables.net',  # Asegúrate de que esta URL coincide exactamente con la URL desde donde cargas los estilos de DataTables
+        '\'unsafe-inline\'',  # Permite estilos en línea
     ],
-    'script-src': [  # se añade esta línea
+    'img-src': [  # Añadir esta línea para permitir imágenes
+        '\'self\'',
+        'cdn.datatables.net',  # Permite imágenes desde DataTables
+    ],
+    'script-src': [  
         '\'self\'',
         'cdnjs.cloudflare.com',
         'stackpath.bootstrapcdn.com',
-        'https://unpkg.com',  # se permite scripts desde unpkg.com
-        'cdn.jsdelivr.net/',
-        'code.jquery.com',  # Agrega esta línea para permitir jQuery desde su CDN
-        '\'unsafe-inline\''  # se permite scripts inline
+        'unpkg.com',  # Asegúrate de que esta URL coincide exactamente con la URL desde donde cargas cualquier script desde unpkg
+        'cdn.jsdelivr.net',
+        'code.jquery.com',  # Permite cargar jQuery desde su CDN
+        '\'unsafe-inline\'',  # Permite scripts en línea
+        'cdn.datatables.net',  # Asegúrate de que esta URL coincide exactamente con la URL desde donde cargas los scripts de DataTables
     ]
 }
 

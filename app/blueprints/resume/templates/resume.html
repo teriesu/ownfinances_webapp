@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <br><br>
+<link rel="stylesheet" href="{{ url_for('resume.static', filename='css/style.css') }}">
 <div class="container text-center">
     <h1>Manipulación de formatos</h1>
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -26,5 +27,26 @@
             <a href="/#" class="btn btn-personal my-btn">Generar formatos</a>
         </div>
     </div>
+
+    <br><br>
+
+    <table id="maestroinsumos" class="table table-bordered  display nowrap" cellspacing="0">
+        <thead>
+            <tr>
+            <th>Patrimonio actual</th>
+            <th>Liquidez actual</th>
+            <th>Último movimiento</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ patrimonio }}</td>
+                <td>{{ liquidez }}</td>
+                <td>{{ ultimo_movimiento }}</td>
+            </tr>
+
+        </tbody>
+    </table>
+
 </div>
 {% endblock %}
