@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% block content %}
+<br><br>
+<link rel="stylesheet" href="{{ url_for('valoracion.static', filename='css/style.css') }}">
+<div class="container text-center">
+    <h1>Ingresar opciones</h1>
+
+    <form id="dynamicForm" method="post" action = "{{ url_for('valoracion.funcionamiento_base')}}">
+
+        <input type="text" name="csrf_token" value="{{ csrf_token() }}" style="display: none;">
+
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dynamicTable">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th id="property1"><input type="text" name="object1" placeholder = "Propiedad 1"></th>
+                        <th id="property2"><input type="text" name="object1" placeholder = "Propiedad 2"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" name="object1" placeholder = "Objeto 1"></td>
+                        <td><input type="text" name="prop1_obj1"></td>
+                        <td><input type="text" name="prop2_obj1"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" name="object2" placeholder = "Objeto 2"></td>
+                        <td><input type="text" name="prop1_obj2"></td>
+                        <td><input type="text" name="prop2_obj2"></td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td>Peso</td>
+                        <td><input type="text" name="weight1" onchange="checkWeights()"></td>
+                        <td><input type="text" name="weight2" onchange="checkWeights()"></td>
+                    </tr>
+                    <tr>
+                        <td>Min/Max</td>
+                        <td><select name="minmax1"><option value="min">Min</option><option value="max">Max</option></select></td>
+                        <td><select name="minmax2"><option value="min">Min</option><option value="max">Max</option></select></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="btn-group" role="group" aria-label="Table Controls">
+            <button type="button" class="btn btn-success" onclick="addProperty()">Añadir Propiedad</button>
+            <button type="button" class="btn btn-danger" onclick="removeProperty()">Eliminar Propiedad</button>
+        </div>
+        <br><br>
+        <div class="btn-group" role="group" aria-label="Table Controls">
+            <button type="button" class="btn btn-success" onclick="addObject()">Añadir Objeto</button>
+            <button type="button" class="btn btn-danger" onclick="removeObject()">Eliminar Objeto</button>
+        </div>
+        <br><br>
+
+        <button type="submit" class="btn btn-personal">Enviar</button>
+    </form>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function addObject() {
+        const table = document.getElementById('dynamicTable');
+        const tbody = table.getElementsByTagName('tbody')[0];
+        let index = tbody.rows.length + 1;
+        let newRow = tbody.insertRow();
+        let cellName = newRow.insertCell(0);
+        cellName.innerHTML = '<input type="text" name="object' + index + '" placeholder="Objeto ' + index + '">';
+    
+        let numProps = table.rows[0].cells.length;
+        for (let i = 1; i < numProps; i++) {
+            let newCell = newRow.insertCell(i);
+            newCell.innerHTML = '<input type="text" name="prop' + i + '_obj' + index + '">';
+        }
+    }
+    
+    
+    function addProperty() {
+        const table = document.getElementById('dynamicTable');
+        let index = table.rows[0].cells.length;
+        let header = table.createTHead().rows[0];
+        let newHeaderCell = header.insertCell(index);
+        newHeaderCell.innerHTML = '<input type="text" name="property' + index + '" placeholder="Propiedad ' + index + '">';
+    
+        let bodyRows = table.getElementsByTagName('tbody')[0].rows;
+        for (let i = 0; i < bodyRows.length; i++) {
+            let newCell = bodyRows[i].insertCell(index);
+            newCell.innerHTML = '<input type="text" name="prop' + index + '_obj' + (i + 1) + '">';
+        }
+    
+        let footRows = table.getElementsByTagName('tfoot')[0].rows;
+        let weightCell = footRows[0].insertCell(index);
+        weightCell.innerHTML = '<input type="text" name="weight' + index + '" onchange="checkWeights()">';
+        let minmaxCell = footRows[1].insertCell(index);
+        minmaxCell.innerHTML = '<select name="minmax' + index + '"><option value="min">Min</option><option value="max">Max</option></select>';
+    }
+    
+    function removeObject() {
+        const table = document.getElementById('dynamicTable');
+        let numRows = table.getElementsByTagName('tbody')[0].rows.length;
+        if (numRows > 2) {
+            table.getElementsByTagName('tbody')[0].deleteRow(-1);
+        }
+    }
+    
+    function removeProperty() {
+        const table = document.getElementById('dynamicTable');
+        let numCols = table.rows[0].cells.length;
+        if (numCols > 3) {
+            [...table.rows].forEach(row => row.deleteCell(-1));
+        }
+    }
+    
+    function checkWeights() {
+        const weightInputs = document.querySelectorAll('tfoot tr:first-child input[type="text"]');
+        let totalWeight = 0;
+        weightInputs.forEach(input => {
+            totalWeight += parseFloat(input.value) || 0;
+        });
+    
+        const weightRow = document.querySelector('tfoot tr:first-child');
+        if (totalWeight !== 100) {
+            weightRow.style.backgroundColor = 'red';
+        } else {
+            weightRow.style.backgroundColor = '';
+        }
+    }
+    
+</script>
+{% endblock %}

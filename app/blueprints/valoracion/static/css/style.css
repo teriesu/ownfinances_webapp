@@ -1,0 +1,58 @@
+table thead{
+background: linear-gradient(to right, #2faa5d, #18CA5B); 
+color:white;
+}
+table.dataTable {
+    margin: 0;
+}
+/* Reduce vertical spacing */
+
+div.dataTables_wrapper div.dataTables_info {
+    padding-top: 0px;
+}
+
+.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td {
+    padding: 4px 8px 4px 8px;
+}
+/* End Reduce vertical spacing */
+
+.bold-row {
+font-weight: bold;
+}    
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.table th, .table td {
+    vertical-align: middle;
+    min-width: 120px; /* Asegura un ancho mínimo para cada celda */
+}
+
+.table th:first-child, .table td:first-child {
+    position: sticky;
+    left: 0;
+    background-color: white;
+    z-index: 1;
+}
+
+/* Estilo para los input dentro de la tabla */
+.table input[type="text"],
+.table select {
+    border: 0;
+    background-color: rgba(0,0,0,0);
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.table input[type="text"]:focus,
+.table select:focus {
+    outline: none;
+    background-color: rgba(0,0,0,0.05);
+}
+
+.table select {
+    cursor: pointer;
+    display: inline-block;
+}

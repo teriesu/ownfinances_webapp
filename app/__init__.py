@@ -116,4 +116,7 @@ def create_app():
     from app.blueprints.investments import investments
     app.register_blueprint(investments)
 
+    from app.blueprints.valoracion import valoracion
+    app.register_blueprint(valoracion)
+
     return app

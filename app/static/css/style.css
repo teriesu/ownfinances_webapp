@@ -10,6 +10,26 @@ body {
     color: #16173B;
     border-color: #2faa5d;
 }
+.btn-success {
+    background-color: #45a6f7;
+    border-color: #45a6f7;
+    color: white;
+}
+.btn-success:hover {
+    background-color: #3c8dcf;
+    border-color: #3c8dcf;
+}
+.btn-danger{
+    background-color: #16173b;
+    border-color: #16173b;
+    color: white;
+}
+.btn-danger:hover{
+    background-color: #020308;
+    border-color: #020308;
+
+}
+
 .btn-personal {
     border: 0;
     background-color: #2faa5d;
