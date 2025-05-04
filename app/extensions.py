@@ -29,23 +29,39 @@ login_manager.login_message = "You must sign in to view this resource."
 login_manager.login_message_category = "info"
 
 from functools import wraps
-from flask_login import LoginManager, current_user
-from flask import redirect, flash
-from app.models import Users
+from flask_login import current_user
+from flask import redirect, flash, jsonify
+
 def role_required(roles):
+    """
+    Decorator for views that require specific roles.
+    Add @role_required('role_name') or @role_required(['role_name1', 'role_name2'])
+    """
+    # Convert single role to list for consistent handling
     if isinstance(roles, str):
         roles = [roles]
-
+        
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
+            # First check if user is logged in
             if not current_user.is_authenticated:
                 flash('You need to login first.')
                 return redirect('/')
-            elif not any(role.name in roles for role in current_user.roles):
+                
+            # Check if user has any of the required roles
+            user_has_role = False
+            for role in current_user.roles:
+                if role.name in roles:
+                    user_has_role = True
+                    break
+                    
+            if not user_has_role:
                 allowed_roles = ', '.join(roles)
                 flash(f'You do not have permission to access this page. Only {allowed_roles} roles are allowed.')
-                return redirect('/')  # redirect to a suitable error/access denied page
+                return redirect('/')
+                
+            # User has necessary role, proceed with the view
             return f(*args, **kwargs)
         return decorated_function
     return decorator

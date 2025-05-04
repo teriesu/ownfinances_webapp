@@ -77,7 +77,7 @@ def create_app():
     app.config["SECURITY_RECOVERABLE"] = False  # Disable password recovery
     app.config["SECURITY_POST_LOGIN_VIEW"] = "/resume/"  # Where to redirect after login
     app.config["SECURITY_POST_LOGOUT_VIEW"] = "/"  # Where to redirect after logout
-    app.config["SECURITY_LOGIN_URL"] = "/"  # Point to your custom login URL
+    app.config["SECURITY_LOGIN_URL"] = "/"
     app.config["SECURITY_SEND_REGISTER_EMAIL"] = False  # Don't send registration emails
     app.config["SECURITY_CONFIRMABLE"] = False  # Don't require email confirmation
     app.config["SECURITY_DEFAULT_REMEMBER_ME"] = True  # Remember users by default
@@ -100,6 +100,7 @@ def create_app():
     
     # Habilitamos el control de sesiones
     login_manager.init_app(app)
+    login_manager.session_protection = "strong"  # Add session protection
     
     # Directly set the unauthorized callback to avoid Flask-Security's handler
     @login_manager.unauthorized_handler
@@ -120,22 +121,12 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
     
-    # Configura la cookie de sesión para que solo se envíe a través de HTTPS
-    # 
+    # Update session cookie configuration to work in local development
     app.config.update(
-        SESSION_COOKIE_SECURE=True,
-    )
-
-    # Marca las cookies de sesión como HttpOnly, 
-    # evita que las cookies de sesión sean accesibles a través de JavaScript en el navegador
-    app.config.update(
+        SESSION_COOKIE_SECURE=False,  # Changed to False for local testing
         SESSION_COOKIE_HTTPONLY=True,
-    )
-
-    # Esta es una opción de las cookies que puede ayudar a proteger contra los ataques de tipo CSRF (Cross-Site Request Forgery)
-    # Puedes configurar la opción SESSION_COOKIE_SAMESITE de Flask en 'Strict' o 'Lax' 
-    app.config.update(
         SESSION_COOKIE_SAMESITE='Lax',
+        PERMANENT_SESSION_LIFETIME=datetime.timedelta(days=1)
     )
 
     # Initialize Flask-Security but disable its views

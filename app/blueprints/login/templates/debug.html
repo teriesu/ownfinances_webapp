@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<br><br>
+<div class="container">
+    <h1>Debug Information</h1>
+    
+    <div class="card">
+        <div class="card-header">
+            <h2>Authentication Status</h2>
+        </div>
+        <div class="card-body">
+            {% if user_data.authenticated %}
+                <div class="alert alert-success">
+                    <h3>Authenticated: Yes</h3>
+                    <p>User ID: {{ user_data.user_id }}</p>
+                    <p>Username: {{ user_data.username }}</p>
+                    <p>FS Uniquifier: {{ user_data.fs_uniquifier }}</p>
+                    <h4>Roles:</h4>
+                    <ul>
+                        {% for role in user_data.roles %}
+                            <li>{{ role }}</li>
+                        {% else %}
+                            <li>No roles assigned</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <a href="/resume" class="btn btn-primary">Try to access Resume</a>
+            {% else %}
+                <div class="alert alert-danger">
+                    <h3>Authenticated: No</h3>
+                    <p>You are not logged in.</p>
+                </div>
+                <a href="/" class="btn btn-primary">Go to Login</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

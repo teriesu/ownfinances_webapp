@@ -32,15 +32,17 @@ def login_app():
                     user.fs_uniquifier = str(uuid.uuid4())
                     db.session.commit()
                     
-                login_user(user)
-                # token = security.create_token(user)
-                flash('Inicio de sesión exitoso', 'success')
-
-                # Establecer la sesión y rotar las cookies
-                session['logged_in'] = True
-                session.modified = True
+                # Login with flask-login and set remember=True for persistent sessions
+                login_user(user, remember=True)
+                
+                # Ensure session is marked as permanent
                 session.permanent = True
-
+                
+                # Set additional session variables
+                session['logged_in'] = True
+                session['user_id'] = user.id
+                session.modified = True
+                
                 # Limpiar y establecer una nueva sesión
                 session.pop('_flashes', None)
                 
@@ -102,3 +104,19 @@ def user_status():
         return jsonify({
             'authenticated': False
         })
+
+@login.route('/debug')
+def debug_route():
+    from flask_login import current_user
+    
+    if current_user.is_authenticated:
+        user_data = {
+            'authenticated': True,
+            'user_id': current_user.id,
+            'username': current_user.user,
+            'fs_uniquifier': current_user.fs_uniquifier,
+            'roles': [role.name for role in current_user.roles]
+        }
+        return render_template('debug.html', user_data=user_data)
+    else:
+        return render_template('debug.html', user_data={'authenticated': False})

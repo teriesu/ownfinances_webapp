@@ -55,8 +55,16 @@ class Users(db.Model, UserMixin):
         return self.active  # o implementa tu lógica para determinar si el usuario está activo
     
     def get_id(self):
-        # Devuelve el ID del usuario como una cadena
-        return str(self.id)
+        # Use fs_uniquifier as unique identifier for the user as required by Flask-Security
+        return str(self.fs_uniquifier)
+    
+    def is_authenticated(self):
+        # Always return True for logged-in users
+        return True
+    
+    def is_anonymous(self):
+        # Always return False for logged-in users
+        return False
 
 class CategoriaGasto(db.Model):
 
