@@ -1,6 +1,6 @@
 from . import resume
 from flask import render_template, redirect, request, flash, session, jsonify, make_response
-from flask_security import auth_required
+from flask_login import login_required
 from sqlalchemy import (
     text
 )
@@ -18,7 +18,7 @@ except locale.Error:
     locale.setlocale(locale.LC_ALL, '')  # Usar el locale por defecto del sistema si no está disponible es_CO.UTF-8
 
 @resume.route("/", methods = ["GET","POST"])
-@auth_required('session')
+@login_required
 @role_required('admin')
 # @limiter.limit('10/minute')
 def login_app():
@@ -44,7 +44,7 @@ def login_app():
     return render_template('resume.html', title = 'Resumen general', patrimonio = patrimonio_actual, liquidez = liquidez_actual, ultimo_movimiento = ultimo_movimiento)
 
 @resume.route("/actualize_db", methods = ["GET","POST"])
-@auth_required('session')
+@login_required
 @role_required('admin')
 # @limiter.limit('1/minute')
 def actualize_info():

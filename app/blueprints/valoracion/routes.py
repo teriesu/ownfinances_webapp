@@ -1,6 +1,6 @@
 from . import valoracion
 from flask import render_template, redirect, request, flash, session, jsonify, make_response
-from flask_security import auth_required
+from flask_login import login_required
 from sqlalchemy import (
     text
 )
@@ -297,7 +297,7 @@ import numpy as np
 
 
 @valoracion.route("/", methods = ["GET","POST"])
-@auth_required('session')
+@login_required
 @role_required('admin')
 def funcionamiento_base():
     if request.method == 'POST':

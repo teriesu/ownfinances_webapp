@@ -1,5 +1,5 @@
 from . import login
-from flask import render_template, redirect, request, flash, session
+from flask import render_template, redirect, request, flash, session, jsonify
 from app.models import(
     Users, Role
 )
@@ -11,6 +11,7 @@ from app.extensions import db
 from app.extensions import limiter, login_manager
 
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+import uuid
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -26,6 +27,11 @@ def login_app():
             password = form.passw.data
             user = Users.query.filter_by(user=user).first()
             if user and sha256_crypt.verify(password, user.password):
+                # Ensure fs_uniquifier is set
+                if not user.fs_uniquifier:
+                    user.fs_uniquifier = str(uuid.uuid4())
+                    db.session.commit()
+                    
                 login_user(user)
                 # token = security.create_token(user)
                 flash('Inicio de sesión exitoso', 'success')
@@ -37,6 +43,11 @@ def login_app():
 
                 # Limpiar y establecer una nueva sesión
                 session.pop('_flashes', None)
+                
+                # Redirect to next page if specified, otherwise to /resume
+                next_page = request.args.get('next')
+                if next_page and next_page.startswith('/'):
+                    return redirect(next_page)
                 return redirect('/resume')
             else:
                 flash('Nombre de usuario o contraseña incorrectos', 'danger')
@@ -56,7 +67,8 @@ def register_app():
 
             user = Users(user=username,
                          email=email,
-                         password=password)
+                         password=password,
+                         fs_uniquifier=str(uuid.uuid4()))
             
             # admin_role = Role.query.filter_by(name='admin').first()
             # if admin_role:
@@ -74,3 +86,19 @@ def register_app():
 def logout():
     logout_user()
     return redirect('/')
+
+@login.route('/user_status')
+def user_status():
+    if current_user.is_authenticated:
+        return jsonify({
+            'authenticated': True,
+            'user_id': current_user.id,
+            'username': current_user.user,
+            'fs_uniquifier': current_user.fs_uniquifier,
+            'roles': [role.name for role in current_user.roles],
+            'active': current_user.active
+        })
+    else:
+        return jsonify({
+            'authenticated': False
+        })

@@ -1,6 +1,6 @@
 from . import wastes
 from flask import render_template, redirect, request, flash, session, jsonify, make_response
-from flask_security import auth_required
+from flask_login import login_required
 from app.models import(
     Users
 )
@@ -10,7 +10,7 @@ from datetime import datetime
 import app.blueprints.wastes.consults as Consults
 
 @wastes.route("/", methods = ["GET","POST"])
-@auth_required('session')
+@login_required
 @role_required(['admin'])
 @limiter.limit('10/minute')
 def wastes_app():    
@@ -18,7 +18,7 @@ def wastes_app():
     return render_template('wastes2.html', title = 'Gastos')
 
 @wastes.route("/api/table", methods = ["GET","POST"])
-@auth_required('session')
+@login_required
 @role_required(['admin'])
 @limiter.limit('10/minute')
 def wastes_api_table():
@@ -37,7 +37,7 @@ def wastes_api_table():
     return Consults.get_wastes(inicial, final)
 
 @wastes.route("/api/graph", methods = ["GET","POST"])
-@auth_required('session')
+@login_required
 @role_required(['admin'])
 @limiter.limit('10/minute')
 def wastes_api_graph():

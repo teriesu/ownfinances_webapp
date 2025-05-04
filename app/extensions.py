@@ -24,7 +24,9 @@ limiter = Limiter(key_func=get_remote_address)
 # Inicializar el objeto LoginManager
 from flask_login import LoginManager
 login_manager = LoginManager()
-
+login_manager.login_view = '/'  # Set the login route
+login_manager.login_message = "You must sign in to view this resource."
+login_manager.login_message_category = "info"
 
 from functools import wraps
 from flask_login import LoginManager, current_user

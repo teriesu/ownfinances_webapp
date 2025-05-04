@@ -29,11 +29,12 @@ class Users(db.Model, UserMixin):
                             backref=db.backref('users', lazy='dynamic'))
 
 
-    def __init__(self, user, email, password, roles=None, active=True):
+    def __init__(self, user, email, password, roles=None, active=True, fs_uniquifier=None):
         self.user=user
         self.email = email
         self.password = password
         self.active = active
+        self.fs_uniquifier = fs_uniquifier
         if roles is None:
             roles = []
         self.roles = roles
