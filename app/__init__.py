@@ -32,7 +32,7 @@ csp = {
         'fonts.gstatic.com',
         'cdnjs.cloudflare.com',
         'stackpath.bootstrapcdn.com',
-        'cdn.datatables.net',  # Asegúrate de que esta URL coincide exactamente con la URL desde donde cargas los estilos de DataTables
+        'cdn.datatables.net',  
         '\'unsafe-inline\'',  # Permite estilos en línea
     ],
     'img-src': [  # Añadir esta línea para permitir imágenes
@@ -43,11 +43,11 @@ csp = {
         '\'self\'',
         'cdnjs.cloudflare.com',
         'stackpath.bootstrapcdn.com',
-        'unpkg.com',  # Asegúrate de que esta URL coincide exactamente con la URL desde donde cargas cualquier script desde unpkg
+        'unpkg.com',
         'cdn.jsdelivr.net',
         'code.jquery.com',  # Permite cargar jQuery desde su CDN
         '\'unsafe-inline\'',  # Permite scripts en línea
-        'cdn.datatables.net',  # Asegúrate de que esta URL coincide exactamente con la URL desde donde cargas los scripts de DataTables
+        'cdn.datatables.net'
     ]
 }
 

@@ -110,7 +110,7 @@ def save_incomings(df, file_id, sheet_name):
         if not is_valid:
             return error_msg, 'danger'
         
-        df['Monto'] = df['Monto'].apply(convert_currency_to_int)
+        df['Monto'] = df['Monto'].apply(convert_currency_to_float)
         df['Categoría'] = df['Categoría'].map(cat_incom_string_to_id())
         _, patrimonio, liquidez = get_current_heritage()
         last_incoming_id = consults.get_last_format_register(file_id, hoja_tabla[sheet_name])
@@ -154,7 +154,7 @@ def save_wastes(df, file_id, sheet_name):
         if not is_valid:
             return error_msg, 'danger'
         
-        df['Monto'] = df['Monto'].apply(convert_currency_to_int)
+        df['Monto'] = df['Monto'].apply(convert_currency_to_float)
         df['Categoría'] = df['Categoría'].map(cat_wast_string_to_id())
         df['Médio de pago'] = df['Médio de pago'].map(medio_string_to_id())
         df['Divisa']  = df['Divisa'].map(divisa_string_to_id())
@@ -217,7 +217,7 @@ def save_investments(df, file_id, sheet_name):
         if not is_valid:
             return error_msg, 'danger'
         
-        df['Monto'] = df['Monto'].apply(convert_currency_to_int)
+        df['Monto'] = df['Monto'].apply(convert_currency_to_float)
         df['Categoría'] = df['Categoría'].map(cat_invest_string_to_id())
 
         _, patrimonio, liquidez = get_current_heritage()

@@ -74,7 +74,7 @@ class ExchangeRateService:
                 target_date = date.today()
             
             # Para fechas muy antiguas, usar tasa por defecto
-            if target_date < date.today() - timedelta(days=365):
+            if target_date < date.today() - timedelta(days=730):
                 return self.default_rates.get('USD')
             
             response = requests.get(
@@ -110,7 +110,7 @@ class ExchangeRateService:
                 target_date = date.today()
             
             # Para fechas muy antiguas, usar tasa por defecto
-            if target_date < date.today() - timedelta(days=30):
+            if target_date < date.today() - timedelta(days=730):
                 return self.default_rates.get(from_currency)
             
             response = requests.get(

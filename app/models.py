@@ -137,7 +137,7 @@ class Gastos(db.Model):
 
     gasto_id = db.Column(db.Integer, autoincrement=True ,primary_key=True)
     description = db.Column(db.Text, nullable=False)
-    monto = db.Column(db.Integer, nullable=False)
+    monto = db.Column(db.Float, nullable=False)
     fecha = db.Column(db.Date(), nullable=False)
     categoria = db.Column(db.Integer, db.ForeignKey(CategoriaGasto.categoria_id), nullable=False)
     hash_formato = db.Column(db.Text, nullable=True)

@@ -7,9 +7,10 @@ hoja_tabla = {
     'Ingresos': 'ingresos'
 }
 
-def convert_currency_to_int(currency_str):
-    # Eliminar el símbolo de dólar y los puntos, y luego convertir a entero
-    return int(currency_str.replace('$', '').replace('.', ''))
+def convert_currency_to_float(currency_str):
+    # Eliminar el símbolo de dólar y los puntos, y luego convertir a float
+    without_thousands = currency_str.replace('$', '').replace('.', '')
+    return float(without_thousands.replace(',', '.'))
 
 def cat_wast_string_to_id():
     session = Session()
