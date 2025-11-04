@@ -37,6 +37,19 @@ def medio_string_to_id():
     
     return medio_dict
 
+def divisa_string_to_id():
+    session = Session()
+
+    consult_divisa = text("""
+        SELECT divisa_id, abreviacion
+        FROM divisas;
+    """)
+    results_divisa = session.execute(consult_divisa).fetchall()
+
+    divisa_dict = {item[1]: item[0] for item in results_divisa}
+    
+    return divisa_dict
+
 def get_current_heritage():
 
     session = Session()

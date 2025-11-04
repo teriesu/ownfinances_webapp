@@ -12,7 +12,6 @@ import pandas as pd
 
 class Gdrive:
     def _auth(self):
-            # Reemplaza 'your_credentials_file.json' con el nombre del archivo JSON descargado en el paso 2
             creds = None
             creds_file = 'gkey.json'
 
@@ -141,7 +140,7 @@ class Gdrive:
         if not values:
             return pd.DataFrame()  # Retorna un DataFrame vacío si no hay datos
         
-        # Asegúrate de que todas las filas tengan la misma longitud
+        # Todas las filas deben tener la misma longitud
         num_columns = len(values[0])
         for row in values[1:]:
             while len(row) < num_columns:

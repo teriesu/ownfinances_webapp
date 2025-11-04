@@ -114,15 +114,29 @@ var table = $('#maestroinsumos').DataTable({
         "targets": [0], // Este es el índice de la columna ID, asumiendo que es la primera columna
         "visible": false, // Esto ocultará la columna ID
         "searchable": false // Opcional, si también quieres hacerla no buscable
-    },{
-        render: $.fn.dataTable.render.number( ',', '.', 0, '$' ), targets: [3]
     }
     ],
     "columns": [
         { "data": "Id" },
         { "data": "Fecha" },
         { "data": "Categoria" },
-        { "data": "Monto" },
+        { 
+            "data": null,
+            render: function (data, type, row) {
+                // Verifica si existe símbolo
+                const simbolo = row.Simbolo ? row.Simbolo + " " : "";
+                // Asegura que MontoOriginal sea numérico
+                const montoOriginal = parseFloat(row.MontoOriginal || 0);
+                // Devuelve texto formateado con dos decimales
+                return simbolo + montoOriginal.toLocaleString('es-ES', { 
+                    minimumFractionDigits: 2, 
+                    maximumFractionDigits: 2 
+                });
+            }
+        },
+        { "data": "Monto",
+            render: $.fn.dataTable.render.number( ',', '.', 0, '$' )
+        },
         { "data": "Descripcion" }
     ],
     dom: 'Bfrtip', // Este parámetro es importante para activar los botones

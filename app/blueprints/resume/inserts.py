@@ -18,6 +18,39 @@ from sqlalchemy import (
 )
 import datetime
 import app.blueprints.resume.consults as consults
+
+def validate_essential_columns(df, required_columns, data_type="datos"):
+    """
+    Valida que las columnas esenciales no tengan valores vacíos
+    Args:
+        df: DataFrame a validar
+        required_columns: Lista de columnas que son obligatorias
+        data_type: Tipo de datos para el mensaje de error
+    Returns:
+        tuple: (is_valid, error_message)
+    """
+    missing_data = []
+    
+    for col in required_columns:
+        if col not in df.columns:
+            missing_data.append(f"Columna '{col}' no encontrada")
+            continue
+            
+        # Verificar valores nulos o vacíos
+        null_mask = df[col].isnull()
+        empty_mask = df[col].astype(str).str.strip() == ''
+        invalid_rows = df[null_mask | empty_mask]
+        
+        if not invalid_rows.empty:
+            invalid_indices = invalid_rows.index.tolist()
+            missing_data.append(f"Columna '{col}': filas {invalid_indices} tienen valores vacíos")
+    
+    if missing_data:
+        error_msg = f"Error de validación en {data_type}:\n" + "\n".join(missing_data)
+        return False, error_msg
+    
+    return True, None
+
 def actualize_db(dictionary):
     session = Session()
     
@@ -70,6 +103,13 @@ def save_incomings(df, file_id, sheet_name):
     try:
         if df.empty:
             return "No hay ingresos nuevos.", 'info'
+        
+        # Validar columnas esenciales para ingresos
+        required_columns = ['Descripción', 'Monto', 'Fecha', 'Categoría']
+        is_valid, error_msg = validate_essential_columns(df, required_columns, "ingresos")
+        if not is_valid:
+            return error_msg, 'danger'
+        
         df['Monto'] = df['Monto'].apply(convert_currency_to_int)
         df['Categoría'] = df['Categoría'].map(cat_incom_string_to_id())
         _, patrimonio, liquidez = get_current_heritage()
@@ -107,9 +147,18 @@ def save_wastes(df, file_id, sheet_name):
     try:
         if df.empty:
             return "No hay gastos nuevos.", 'info'
+        
+        # Validar columnas esenciales para gastos
+        required_columns = ['Descripción', 'Monto', 'Fecha', 'Categoría', 'Médio de pago', 'Divisa']
+        is_valid, error_msg = validate_essential_columns(df, required_columns, "gastos")
+        if not is_valid:
+            return error_msg, 'danger'
+        
         df['Monto'] = df['Monto'].apply(convert_currency_to_int)
         df['Categoría'] = df['Categoría'].map(cat_wast_string_to_id())
         df['Médio de pago'] = df['Médio de pago'].map(medio_string_to_id())
+        df['Divisa']  = df['Divisa'].map(divisa_string_to_id())
+        print(df.head())
 
         _, patrimonio, liquidez = get_current_heritage()
         
@@ -119,14 +168,14 @@ def save_wastes(df, file_id, sheet_name):
         for index, row in df.iloc[start_index:].iterrows():
             iterated = True
             nuevo_bien = None
-            if row['Categoría'] == 10:
-                nuevo_bien = Bienes(
-                    description=row['Bien'],
-                    valor_inicial=row['Monto']
-                )
-                session.add(nuevo_bien)
-                session.commit()
-                patrimonio += row['Monto']
+            # if row['Categoría'] == 10:
+            #     nuevo_bien = Bienes(
+            #         description=row['Bien'],
+            #         valor_inicial=row['Monto']
+            #     )
+            #     session.add(nuevo_bien)
+            #     session.commit()
+            #     patrimonio += row['Monto']
             
             nuevo_gasto = Gastos(
                 description=row['Descripción'],
@@ -136,13 +185,14 @@ def save_wastes(df, file_id, sheet_name):
                 hash_formato=file_id,
                 id_df_formato=index,
                 id_patrimonio=nuevo_bien.bien_id if nuevo_bien is not None else None,
-                essential = True if row['Fecha'] == 'Si' else False
+                essential = True if row['Fecha'] == 'Si' else False,
+                divisa = row['Divisa']
             )
             session.add(nuevo_gasto)
             liquidez -= row['Monto']
         
-        if iterated:
-            update_current_money(patrimonio, liquidez, row['Descripción'])
+        # if iterated:
+            # update_current_money(patrimonio, liquidez, row['Descripción'])
 
         session.commit()
         return "Gastos guardados con éxito.", 'success'
@@ -160,6 +210,12 @@ def save_investments(df, file_id, sheet_name):
     try:
         if df.empty:
             return "No hay inversiones nuevas.", 'info'
+        
+        # Validar columnas esenciales para inversiones
+        required_columns = ['Descripción', 'Monto', 'Rentabilidad Esperada', 'Fecha', 'Categoría']
+        is_valid, error_msg = validate_essential_columns(df, required_columns, "inversiones")
+        if not is_valid:
+            return error_msg, 'danger'
         
         df['Monto'] = df['Monto'].apply(convert_currency_to_int)
         df['Categoría'] = df['Categoría'].map(cat_invest_string_to_id())

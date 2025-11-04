@@ -31,7 +31,7 @@ A comprehensive web-based solution for personal finance tracking, monitoring, an
 
 ### 1. Clone the Repository
 ```bash
-git clone <repository-url>
+git clone https://github.com/teriesu/ownfinances_webapp.git
 cd "Finances webapp"
 ```
 

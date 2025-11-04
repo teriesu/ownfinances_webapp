@@ -106,6 +106,30 @@ class Bienes(db.Model):
             'description': self.description,
             'valor_inicial': self.valor_inicial
         }
+    
+class Divisa(db.Model):
+    __tablename__ = 'divisas'
+
+    divisa_id = db.Column(db.Integer, autoincrement=True ,primary_key=True)
+    divisa = db.Column(db.Text, nullable=False)
+    simbolo = db.Column(db.String, nullable=False)
+    abreviacion = db.Column(db.Text, nullable=False)
+
+    def __init__(self, divisa, simbolo, abreviacion):
+        self.divisa = divisa
+        self.simbolo = simbolo
+        self.abreviacion = abreviacion
+
+    def __repr__(self):
+        return f'{self.divisa_id, self.divisa, self.simbolo, self.abreviacion}'
+
+    def to_dict(self):
+        return {
+            'divisa_id': self.divisa_id,
+            'divisa': self.divisa,
+            'simbolo': self.simbolo,
+            'abreviacion': self.abreviacion
+        }
 
 class Gastos(db.Model):
 
@@ -120,12 +144,14 @@ class Gastos(db.Model):
     id_df_formato = db.Column(db.Integer, nullable=True)
     id_patrimonio = db.Column(db.Integer, db.ForeignKey(Bienes.bien_id), nullable=True)
     essential = db.Column(db.Boolean, nullable=False)
+    divisa = db.Column(db.Integer, db.ForeignKey(Divisa.divisa_id), nullable=True)
 
     #Relaciones
     categoria_rel = db.relationship('CategoriaGasto', backref=db.backref('categoria_gasto', lazy=True))
     bien_rel = db.relationship('Bienes', backref=db.backref('gastos_bienes', lazy=True))
+    divisa_rel = db.relationship('Divisa', backref=db.backref('gastos_divisa', lazy=True))
 
-    def __init__(self, description, monto, fecha, categoria, hash_formato, id_df_formato, id_patrimonio, essential):
+    def __init__(self, description, monto, fecha, categoria, hash_formato, id_df_formato, id_patrimonio, essential, divisa):
         self.description = description
         self.monto = monto
         self.fecha = fecha
@@ -134,10 +160,11 @@ class Gastos(db.Model):
         self.id_df_formato = id_df_formato
         self.id_patrimonio = id_patrimonio
         self.essential = essential
+        self.divisa = divisa
 
     def __repr__(self):
-        return f'{self.description, self.monto, self.fecha, self.categoria, self.hash_formato, self.id_df_formato, self.id_patrimonio, self.essential}'
-    
+        return f'{self.description, self.monto, self.fecha, self.categoria, self.hash_formato, self.id_df_formato, self.id_patrimonio, self.essential, self.divisa}'
+
     def to_dict(self):
         return {
             'description': self.description,
@@ -147,7 +174,8 @@ class Gastos(db.Model):
             'hash_formato': self.hash_formato,
             'id_df_formato': self.id_df_formato,
             'id_patrimonio': self.id_patrimonio,
-            'essential': self.essential
+            'essential': self.essential,
+            'divisa': self.divisa
         }
 
 class CategoriaInversion(db.Model):
