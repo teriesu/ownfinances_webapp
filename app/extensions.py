@@ -6,7 +6,17 @@ db = SQLAlchemy()
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from credentials import *
-engine = create_engine(f'postgresql+psycopg2://{username}:{password}@{host}:{port}/{database}')
+from .init_utils import get_windows_host_ip_from_wsl
+import platform
+
+host = HOST
+
+if "microsoft" in platform.uname().release.lower():
+    wsl_ip = get_windows_host_ip_from_wsl()
+    if wsl_ip:
+        host = wsl_ip
+
+engine = create_engine(f'postgresql+psycopg2://{USERNAME}:{PASSWORD}@{host}:{PORT}/{DATABASE}')
 Session = sessionmaker(bind=engine)
 
 # Creamos el limitador de solicitudes por endpoint

@@ -2,6 +2,7 @@ from .extensions import db
 from flask_bootstrap import Bootstrap4
 from flask_migrate import Migrate
 from flask_wtf import CSRFProtect
+import platform
 from credentials import *
 from .extensions import db, limiter, login_manager
 from flask import Flask, redirect, request
@@ -9,6 +10,7 @@ from flask_talisman import Talisman
 import datetime
 from flask_security import Security, SQLAlchemyUserDatastore
 from .models import Users, Role
+from .init_utils import get_windows_host_ip_from_wsl
 migrate = Migrate()
 
 # Se especifican los recursos CDN que tendran acceso a nuestra aplicación
@@ -52,13 +54,21 @@ csp = {
 def create_app():
     #creamos la app
     app = Flask(__name__)
-    
-    #Asignamos la base de datos a la app
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql+psycopg2://{username}:{password}@{host}:{port}/{database}'
+
+    host = HOST
+
+    if "microsoft" in platform.uname().release.lower():
+        wsl_ip = get_windows_host_ip_from_wsl()
+        if wsl_ip:
+            host = wsl_ip
+
+    # Asignar cadena de conexión final
+    print(f'Cadena de conexión final: postgresql+psycopg2://{USERNAME}:***@{host}:{PORT}/{DATABASE}')
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql+psycopg2://{USERNAME}:{PASSWORD}@{host}:{PORT}/{DATABASE}'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    #Proteccián cfr
-    app.secret_key = secret_key #llave secreta
+    #Protección CSRF
+    app.secret_key = SECRET_KEY #llave secreta
     app.config['SECURITY_ENABLED'] = SECURITY_ENABLED
     app.config["SECURITY_CSRF_COOKIE_NAME"] = SECURITY_CSRF_COOKIE_NAME #nombre de la cookie de seguridad
     app.config["WTF_CSRF_TIME_LIMIT"] = WTF_CSRF_TIME_LIMIT #Tiempo de validez de la cookie
