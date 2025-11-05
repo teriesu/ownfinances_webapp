@@ -89,3 +89,58 @@ def cuenta_string_to_id():
     cuenta_dict = {item[1]: item[0] for item in results_cuenta}
     
     return cuenta_dict
+
+def medio_id_to_string():
+    """
+    Convierte IDs de medios de pago a nombres
+    Returns: dict {id: nombre}
+    """
+    session = Session()
+    try:
+        consult_medio = text("""
+            SELECT medio_pago_id, medio_pago
+            FROM medios_de_pago;
+        """)
+        results_medio = session.execute(consult_medio).fetchall()
+        
+        medio_dict = {item[0]: item[1] for item in results_medio}
+        return medio_dict
+    finally:
+        session.close()
+
+def divisa_id_to_string():
+    """
+    Convierte IDs de divisas a nombres
+    Returns: dict {id: abreviacion}
+    """
+    session = Session()
+    try:
+        consult_divisa = text("""
+            SELECT divisa_id, divisa, abreviacion
+            FROM divisas;
+        """)
+        results_divisa = session.execute(consult_divisa).fetchall()
+        
+        # Usar el nombre completo de la divisa en lugar de solo la abreviación para mejor legibilidad
+        divisa_dict = {item[0]: f"{item[1]} ({item[2]})" for item in results_divisa}
+        return divisa_dict
+    finally:
+        session.close()
+
+def categoria_gasto_id_to_string():
+    """
+    Convierte IDs de categorías de gasto a nombres
+    Returns: dict {id: nombre}
+    """
+    session = Session()
+    try:
+        consult_categoria = text("""
+            SELECT categoria_id, categoria
+            FROM categoria_gasto;
+        """)
+        results_categoria = session.execute(consult_categoria).fetchall()
+        
+        categoria_dict = {item[0]: item[1] for item in results_categoria}
+        return categoria_dict
+    finally:
+        session.close()

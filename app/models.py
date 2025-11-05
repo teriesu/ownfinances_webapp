@@ -91,8 +91,9 @@ class Medios_de_pago(db.Model):
     medio_pago_id = db.Column(db.Integer, autoincrement=True ,primary_key=True)
     medio_pago = db.Column(db.Text, nullable=False)
 
-    def __init__(self, medio_pago):
+    def __init__(self, medio_pago, cuenta_origen_id=None):
         self.medio_pago = medio_pago
+        self.cuenta_origen_id = cuenta_origen_id
 
     def __repr__(self):
         return f'{self.medio_pago_id, self.medio_pago}'
@@ -100,7 +101,33 @@ class Medios_de_pago(db.Model):
     def to_dict(self):
         return {
             'medio_pago_id': self.medio_pago_id,
-            'medio_pago': self.medio_pago
+            'medio_pago': self.medio_pago,
+            'cuenta_origen_id': self.cuenta_origen_id
+        }
+    
+class Medios_pago_cuentas(db.Model):
+    __tablename__ = 'medios_pago_cuentas'
+
+    medio_pago_cuenta_id = db.Column(db.Integer, autoincrement=True ,primary_key=True)
+    medio_pago_id = db.Column(db.Integer, db.ForeignKey(Medios_de_pago.medio_pago_id), nullable=False)
+    cuenta_id = db.Column(db.Integer, db.ForeignKey('cuentas.cuenta_id'), nullable=False)
+
+    # Relaciones
+    medio_pago_rel = db.relationship('Medios_de_pago', backref=db.backref('medios_pago_cuentas', lazy=True))
+    cuenta_rel = db.relationship('Cuentas', backref=db.backref('medios_pago_cuentas', lazy=True))
+
+    def __init__(self, medio_pago_id, cuenta_id):
+        self.medio_pago_id = medio_pago_id
+        self.cuenta_id = cuenta_id
+
+    def __repr__(self):
+        return f'{self.medio_pago_cuenta_id, self.medio_pago_id, self.cuenta_id}'
+    
+    def to_dict(self):
+        return {
+            'medio_pago_cuenta_id': self.medio_pago_cuenta_id,
+            'medio_pago_id': self.medio_pago_id,
+            'cuenta_id': self.cuenta_id
         }
     
 class Bienes(db.Model):

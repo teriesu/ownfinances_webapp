@@ -122,7 +122,7 @@ def get_last_balance_by_account():
             FROM public.saldo_cuenta
             ORDER BY cuenta_id, fecha_movimiento DESC, saldo_id DESC;
         """)
-        # Si usas SQLAlchemy >=1.4, mappings() te da dicts por fila
+        
         rows = session.execute(consult_balance).mappings().all()
         # Construimos dict: cuenta_id -> saldo
         return {row['cuenta_id']: float(row['saldo']) for row in rows}
@@ -134,22 +134,41 @@ def get_last_balance_by_account_detailed():
     session = Session()
     try:
         consult_balance = text("""
+            SELECT
+            s.cuenta_id,
+            s.saldo,
+            c.divisa,
+            ARRAY_AGG(mp.medio_pago_id) AS medios_pago
+        FROM (
             SELECT DISTINCT ON (cuenta_id)
-                sc.saldo_id,
-                sc.cuenta_id,
-                sc.saldo,
-                sc.fecha_movimiento,
-                sc.fecha_registro,
-                c.nombre_cuenta,
-                c.divisa,
-                c.nombre_cuenta
-            FROM public.saldo_cuenta sc
-            JOIN cuentas c ON sc.cuenta_id = c.cuenta_id
-            ORDER BY cuenta_id, fecha_movimiento DESC, saldo_id DESC;
+                cuenta_id,
+                saldo,
+                fecha_movimiento,
+                saldo_id
+            FROM public.saldo_cuenta
+            ORDER BY cuenta_id, fecha_movimiento DESC, saldo_id DESC
+        ) AS s
+        JOIN cuentas c ON s.cuenta_id = c.cuenta_id
+        LEFT JOIN medios_pago_cuentas mpc ON c.cuenta_id = mpc.cuenta_id
+        LEFT JOIN medios_de_pago mp ON mpc.medio_pago_id = mp.medio_pago_id
+        GROUP BY s.cuenta_id, s.saldo, c.divisa;
         """)
-        # Si usas SQLAlchemy >=1.4, mappings() te da dicts por fila
-        # (medio_id, divisa_id)
-        rows = session.execute(consult_balance).mappings().all()
         
+        rows = session.execute(consult_balance).fetchall()
+
+        registro = [
+            {
+                'cuenta_id': row[0],
+                'saldo': float(row[1]),
+                'divisa': row[2],
+                'medios_pago': row[3] if row[3] is not None else []
+            }
+            for row in rows
+        ]
+
+        print('registro', registro)
+
+        return registro
+
     finally:
         session.close()
