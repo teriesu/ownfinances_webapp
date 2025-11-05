@@ -107,3 +107,49 @@ def get_last_format_register(hash_format, nombre_tabla):
     session.close()
     
     return ultimo_registro[0]   
+
+def get_last_balance_by_account():
+    """Devuelve {cuenta_id: saldo} con el último saldo por cuenta."""
+    session = Session()
+    try:
+        consult_balance = text("""
+            SELECT DISTINCT ON (cuenta_id)
+                saldo_id,
+                cuenta_id,
+                saldo,
+                fecha_movimiento,
+                fecha_registro
+            FROM public.saldo_cuenta
+            ORDER BY cuenta_id, fecha_movimiento DESC, saldo_id DESC;
+        """)
+        # Si usas SQLAlchemy >=1.4, mappings() te da dicts por fila
+        rows = session.execute(consult_balance).mappings().all()
+        # Construimos dict: cuenta_id -> saldo
+        return {row['cuenta_id']: float(row['saldo']) for row in rows}
+    finally:
+        session.close()
+
+def get_last_balance_by_account_detailed():
+    """Devuelve {cuenta_id: saldo} con el último saldo por cuenta."""
+    session = Session()
+    try:
+        consult_balance = text("""
+            SELECT DISTINCT ON (cuenta_id)
+                sc.saldo_id,
+                sc.cuenta_id,
+                sc.saldo,
+                sc.fecha_movimiento,
+                sc.fecha_registro,
+                c.nombre_cuenta,
+                c.divisa,
+                c.nombre_cuenta
+            FROM public.saldo_cuenta sc
+            JOIN cuentas c ON sc.cuenta_id = c.cuenta_id
+            ORDER BY cuenta_id, fecha_movimiento DESC, saldo_id DESC;
+        """)
+        # Si usas SQLAlchemy >=1.4, mappings() te da dicts por fila
+        # (medio_id, divisa_id)
+        rows = session.execute(consult_balance).mappings().all()
+        
+    finally:
+        session.close()

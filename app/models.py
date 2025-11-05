@@ -85,6 +85,24 @@ class CategoriaGasto(db.Model):
             'categoria': self.categoria
         }
 
+class Medios_de_pago(db.Model):
+    __tablename__ = 'medios_de_pago'
+
+    medio_pago_id = db.Column(db.Integer, autoincrement=True ,primary_key=True)
+    medio_pago = db.Column(db.Text, nullable=False)
+
+    def __init__(self, medio_pago):
+        self.medio_pago = medio_pago
+
+    def __repr__(self):
+        return f'{self.medio_pago_id, self.medio_pago}'
+    
+    def to_dict(self):
+        return {
+            'medio_pago_id': self.medio_pago_id,
+            'medio_pago': self.medio_pago
+        }
+    
 class Bienes(db.Model):
     __tablename__ = 'bienes'
 
@@ -145,13 +163,16 @@ class Gastos(db.Model):
     id_patrimonio = db.Column(db.Integer, db.ForeignKey(Bienes.bien_id), nullable=True)
     essential = db.Column(db.Boolean, nullable=False)
     divisa = db.Column(db.Integer, db.ForeignKey(Divisa.divisa_id), nullable=True)
+    medio_pago_id = db.Column(db.Integer, db.ForeignKey(Medios_de_pago.medio_pago_id), nullable=True)
+
 
     #Relaciones
     categoria_rel = db.relationship('CategoriaGasto', backref=db.backref('categoria_gasto', lazy=True))
     bien_rel = db.relationship('Bienes', backref=db.backref('gastos_bienes', lazy=True))
     divisa_rel = db.relationship('Divisa', backref=db.backref('gastos_divisa', lazy=True))
+    medio_pago_rel = db.relationship('Medios_de_pago', backref=db.backref('gastos_medio_pago', lazy=True))
 
-    def __init__(self, description, monto, fecha, categoria, hash_formato, id_df_formato, id_patrimonio, essential, divisa):
+    def __init__(self, description, monto, fecha, categoria, hash_formato, id_df_formato, id_patrimonio, essential, divisa, medio_pago_id):
         self.description = description
         self.monto = monto
         self.fecha = fecha
@@ -161,9 +182,10 @@ class Gastos(db.Model):
         self.id_patrimonio = id_patrimonio
         self.essential = essential
         self.divisa = divisa
+        self.medio_pago_id = medio_pago_id
 
     def __repr__(self):
-        return f'{self.description, self.monto, self.fecha, self.categoria, self.hash_formato, self.id_df_formato, self.id_patrimonio, self.essential, self.divisa}'
+        return f'{self.description, self.monto, self.fecha, self.categoria, self.hash_formato, self.id_df_formato, self.id_patrimonio, self.essential, self.divisa, self.medio_pago_id}'
 
     def to_dict(self):
         return {
@@ -175,7 +197,8 @@ class Gastos(db.Model):
             'id_df_formato': self.id_df_formato,
             'id_patrimonio': self.id_patrimonio,
             'essential': self.essential,
-            'divisa': self.divisa
+            'divisa': self.divisa,
+            'medio_pago_id': self.medio_pago_id
         }
 
 class CategoriaInversion(db.Model):
@@ -257,24 +280,6 @@ class Inversion(db.Model):
         }
 
 
-class Medios_de_pago(db.Model):
-    __tablename__ = 'medios_de_pago'
-
-    medio_pago_id = db.Column(db.Integer, autoincrement=True ,primary_key=True)
-    medio_pago = db.Column(db.Text, nullable=False)
-
-    def __init__(self, medio_pago):
-        self.medio_pago = medio_pago
-
-    def __repr__(self):
-        return f'{self.medio_pago_id, self.medio_pago}'
-    
-    def to_dict(self):
-        return {
-            'medio_pago_id': self.medio_pago_id,
-            'medio_pago': self.medio_pago
-        }
-
 class Historical_money(db.Model):
     __tablename__ = 'historical_money'
 
@@ -330,6 +335,7 @@ class Ingresos(db.Model):
     categoria = db.Column(db.Integer, db.ForeignKey(Categoria_ingreso.categoria_ingreso_id), nullable=False)
     hash_formato = db.Column(db.Text, nullable=True)
     id_df_formato = db.Column(db.Integer, nullable=True)
+
     
     # Relaciones
     categoria_rel = db.relationship('Categoria_ingreso', backref=db.backref('ingresos', lazy=True))
@@ -353,4 +359,115 @@ class Ingresos(db.Model):
             'categoria': self.categoria,
             'hash_formato': self.hash_formato,
             'id_df_formato': self.id_df_formato
+        }
+    
+class Cuentas(db.Model):
+    __tablename__ = 'cuentas'
+
+    cuenta_id = db.Column(db.Integer, autoincrement=True ,primary_key=True)
+    institucion_financiera = db.Column(db.Text, nullable=False)
+    nombre_cuenta = db.Column(db.Text, nullable=False)
+    divisa = db.Column(db.Integer, db.ForeignKey(Divisa.divisa_id), nullable=False)
+
+    #Relaciones
+    divisa_rel = db.relationship('Divisa', backref=db.backref('cuentas_divisa', lazy=True))
+
+    def __init__(self, institucion_financiera, nombre_cuenta, divisa):
+        self.institucion_financiera = institucion_financiera
+        self.nombre_cuenta = nombre_cuenta
+        self.divisa = divisa
+
+    def __repr__(self):
+        return f'{self.cuenta_id, self.institucion_financiera, self.nombre_cuenta, self.divisa}'
+
+    def to_dict(self):
+        return {
+            'cuenta_id': self.cuenta_id,
+            'institucion_financiera': self.institucion_financiera,
+            'nombre_cuenta': self.nombre_cuenta,
+            'divisa': self.divisa
+        }
+    
+class SaldoCuenta(db.Model):
+    __tablename__ = 'saldo_cuenta'
+
+    saldo_id = db.Column(db.Integer, autoincrement=True ,primary_key=True)
+    cuenta_id = db.Column(db.Integer, db.ForeignKey(Cuentas.cuenta_id), nullable=False)
+    saldo = db.Column(db.Float, nullable=False)
+    fecha_movimiento = db.Column(db.Date(), nullable=False)
+    fecha_registro = db.Column(db.DateTime, nullable=False)
+    hash_formato = db.Column(db.Text, nullable=True)
+    id_df_formato = db.Column(db.Integer, nullable=True)
+    descripcion = db.Column(db.Text, nullable=True)
+
+    #Relaciones
+    cuenta_rel = db.relationship('Cuentas', backref=db.backref('saldos_cuenta', lazy=True))
+
+    def __init__(self, cuenta_id, saldo, fecha_movimiento, hash_formato=None, id_df_formato=None, descripcion=None):
+        self.cuenta_id = cuenta_id
+        self.saldo = saldo
+        self.fecha_movimiento = fecha_movimiento
+        self.fecha_registro = datetime.datetime.now()
+        self.hash_formato = hash_formato
+        self.id_df_formato = id_df_formato
+        self.descripcion = descripcion
+
+    def __repr__(self):
+        return f'{self.saldo_id, self.cuenta_id, self.saldo, self.fecha_movimiento}'
+
+    def to_dict(self):
+        return {
+            'saldo_id': self.saldo_id,
+            'cuenta_id': self.cuenta_id,
+            'saldo': self.saldo,
+            'fecha_movimiento': self.fecha_movimiento,
+            'fecha_registro': self.fecha_registro,
+            'hash_formato': self.hash_formato,
+            'id_df_formato': self.id_df_formato,
+            'descripcion': self.descripcion
+        }
+
+class Transferencias(db.Model):
+    __tablename__ = 'transferencias'
+
+    transferencia_id = db.Column(db.Integer, autoincrement=True ,primary_key=True)
+    cuenta_origen = db.Column(db.Integer, db.ForeignKey(Cuentas.cuenta_id), nullable=False)
+    cuenta_destino = db.Column(db.Integer, db.ForeignKey(Cuentas.cuenta_id), nullable=False)
+    monto_enviado = db.Column(db.Float, nullable=False)
+    divisa_origen = db.Column(db.Integer, db.ForeignKey(Divisa.divisa_id), nullable=False)
+    monto_recibido = db.Column(db.Float, nullable=False)
+    divisa_destino = db.Column(db.Integer, db.ForeignKey(Divisa.divisa_id), nullable=False)
+    fecha = db.Column(db.DateTime, nullable=False)
+    descripcion = db.Column(db.Text, nullable=True)
+
+    #Relaciones
+    cuenta_origen_rel = db.relationship('Cuentas', foreign_keys=[cuenta_origen], backref=db.backref('transferencias_origen', lazy=True))
+    cuenta_destino_rel = db.relationship('Cuentas', foreign_keys=[cuenta_destino], backref=db.backref('transferencias_destino', lazy=True))
+    divisa_origen_rel = db.relationship('Divisa', foreign_keys=[divisa_origen], backref=db.backref('transferencias_divisa_origen', lazy=True))
+    divisa_destino_rel = db.relationship('Divisa', foreign_keys=[divisa_destino], backref=db.backref('transferencias_divisa_destino', lazy=True))
+
+    def __init__(self, cuenta_origen, cuenta_destino, monto_enviado, divisa_origen, monto_recibido, divisa_destino, fecha, descripcion):
+        self.cuenta_origen = cuenta_origen
+        self.cuenta_destino = cuenta_destino
+        self.monto_enviado = monto_enviado
+        self.divisa_origen = divisa_origen
+        self.monto_recibido = monto_recibido
+        self.divisa_destino = divisa_destino
+        self.fecha = fecha
+        self.descripcion = descripcion
+
+    def __repr__(self):
+        return f'{self.transferencia_id, self.cuenta_origen, self.cuenta_destino, self.monto_enviado, self.divisa_origen, self.monto_recibido, self.divisa_destino, self.fecha, self.descripcion}'
+    
+    def to_dict(self):
+        return {
+            'transferencia_id': self.transferencia_id,
+            'cuenta_origen': self.cuenta_origen,
+            'cuenta_destino': self.cuenta_destino,
+            'monto_enviado': self.monto_enviado,
+            'divisa_origen': self.divisa_origen,
+            'monto_recibido': self.monto_recibido,
+            'divisa_destino': self.divisa_destino,
+            'fecha': self.fecha,
+            'descripcion': self.descripcion
         }

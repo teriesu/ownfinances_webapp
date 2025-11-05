@@ -51,22 +51,6 @@ def divisa_string_to_id():
     
     return divisa_dict
 
-def get_current_heritage():
-
-    session = Session()
-
-    consult_patrimonio = text("""
-        SELECT fecha, patrimonio, liquidez
-	        FROM public.historical_money
-            ORDER BY fecha DESC
-            LIMIT 1;
-    """)
-
-    results_patrimonio = session.execute(consult_patrimonio).fetchone()
-    session.close()
-
-    return results_patrimonio
-
 def cat_incom_string_to_id():
     session = Session()
 
@@ -92,3 +76,16 @@ def cat_invest_string_to_id():
     categoria_dict = {item[1]: item[0] for item in results_categoria}
     
     return categoria_dict
+
+def cuenta_string_to_id():
+    session = Session()
+
+    consult_cuenta = text("""
+        SELECT cuenta_id, nombre_cuenta
+        FROM cuentas;
+    """)
+    results_cuenta = session.execute(consult_cuenta).fetchall()
+
+    cuenta_dict = {item[1]: item[0] for item in results_cuenta}
+    
+    return cuenta_dict
