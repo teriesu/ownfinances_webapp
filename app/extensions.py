@@ -90,5 +90,5 @@ def role_required(roles):
         return decorated_function
     return decorator
 
-from app.gdrive_management import Gdrive
+from app.services.gdrive_management import Gdrive
 gdrive = Gdrive()

@@ -8,7 +8,7 @@ from app.extensions import Session, db, role_required
 from app.extensions import db
 from app.extensions import limiter
 
-from app.gdrive_management import Gdrive
+from app.services.gdrive_management import Gdrive
 import app.blueprints.resume.inserts as inserts
 import app.blueprints.resume.consults as consults
 from app.services.exchange_rate_service import ExchangeRateService
@@ -105,14 +105,14 @@ def expenses_by_category():
 
     query = text("""
         SELECT
-            c.category,
-            SUM(e.valor) AS total
+            c.categoria,
+            SUM(e.monto) AS total
         FROM
-            expenses e
+            gastos e
         JOIN
-            categories c ON e.categoria_id = c.id
+            categoria_gasto c ON e.categoria = c.categoria_id
         GROUP BY
-            c.category
+            c.categoria
         ORDER BY
             total DESC;
     """)

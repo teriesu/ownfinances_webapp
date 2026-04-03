@@ -8,7 +8,7 @@ from app.extensions import Session, db, role_required
 from app.extensions import db
 from app.extensions import limiter
 
-from app.gdrive_management import Gdrive
+from app.services.gdrive_management import Gdrive
 import app.blueprints.resume.inserts as inserts
 import locale
 
