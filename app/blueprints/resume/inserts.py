@@ -153,67 +153,70 @@ def update_current_money(suma_por_medio_divisa, total_records_expected):
 
 def save_incomings(df, file_id, sheet_name):
     session = Session()
-    try:
-        if df.empty:
-            return "No hay ingresos nuevos.", 'info'
+    # try:
+    if df.empty:
+        return "No hay ingresos nuevos.", 'info'
 
-        required_columns = ['Descripción', 'Monto', 'Fecha', 'Categoría', 'Cuenta']
-        is_valid, error_msg = validate_essential_columns(df, required_columns, "ingresos")
-        if not is_valid:
-            return error_msg, 'danger'
+    required_columns = ['Descripción', 'Monto', 'Fecha', 'Categoría', 'Cuenta']
+    is_valid, error_msg = validate_essential_columns(df, required_columns, "ingresos")
+    if not is_valid:
+        return error_msg, 'danger'
 
-        last_incoming_id = consults.get_last_format_register(file_id, 'saldo_cuenta')
-        start_index = last_incoming_id + 1 if last_incoming_id is not None else 0
+    last_incoming_id = consults.get_last_format_register(file_id, 'saldo_cuenta')
+    start_index = last_incoming_id + 1 if last_incoming_id is not None else 0
 
-        # Limpieza / normalización
-        df = df.copy()
-        df['Monto'] = df['Monto'].apply(convert_currency_to_float).astype(float)
-        df['Categoría'] = df['Categoría'].map(cat_incom_string_to_id())
-        df['Cuenta'] = df['Cuenta'].map(cuenta_string_to_id())
-        df['Fecha'] = df['Fecha'].apply(lambda x: datetime.datetime.strptime(x, '%d/%m/%Y').date())
+    # Limpieza / normalización
+    df = df.copy()
 
-        # Ordena para que el saldo vaya “acumulando” por cuenta
-        df.sort_values(['Cuenta', 'Fecha'], inplace=True)
+    print('dataframe ingresos preasignacion', df)
+    df['Monto'] = df['Monto'].apply(convert_currency_to_float).astype(float)
+    df['Categoría'] = df['Categoría'].map(cat_incom_string_to_id())
+    df['Cuenta'] = df['Cuenta'].map(cuenta_string_to_id())
+    df['Fecha'] = df['Fecha'].apply(lambda x: datetime.datetime.strptime(x, '%d/%m/%Y').date())
+    # Ordena para que el saldo vaya “acumulando” por cuenta
+    df.sort_values(['Cuenta', 'Fecha'], inplace=True)
+    print('dataframe ingresos postasignacion', df)
 
-        # Trae últimos saldos actuales y prepáralos para ir actualizando
-        last_balance_by_account = consults.get_last_balance_by_account()
-        running_balances = defaultdict(float, last_balance_by_account)
 
-        nuevos = []
-        for index, row in df.iloc[start_index:].iterrows():
-            cuenta_id = int(row['Cuenta'])
-            monto = float(row['Monto'])
-            fecha = row['Fecha']
+    # Trae últimos saldos actuales y prepáralos para ir actualizando
+    last_balance_by_account = consults.get_last_balance_by_account()
+    running_balances = defaultdict(float, last_balance_by_account)
 
-            # saldo acumulado por cuenta
-            new_balance = running_balances[cuenta_id] + monto
+    nuevos = []
+    for index, row in df.iloc[start_index:].iterrows():
+        cuenta_id = int(row['Cuenta'])
+        monto = float(row['Monto'])
+        fecha = row['Fecha']
 
-            nuevo_ingreso = SaldoCuenta(
-                cuenta_id=cuenta_id,
-                fecha_movimiento=fecha,
-                saldo=new_balance,
-                descripcion=row['Descripción'],
-                hash_formato=file_id,
-                id_df_formato=index
-            )
-            nuevos.append(nuevo_ingreso)
+        # saldo acumulado por cuenta
+        new_balance = running_balances[cuenta_id] + monto
 
-            # Actualiza el acumulado en RAM para la siguiente fila de la misma cuenta
-            running_balances[cuenta_id] = new_balance
+        nuevo_ingreso = SaldoCuenta(
+            cuenta_id=cuenta_id,
+            fecha_movimiento=fecha,
+            saldo=new_balance,
+            descripcion=row['Descripción'],
+            hash_formato=file_id,
+            id_df_formato=index
+        )
+        nuevos.append(nuevo_ingreso)
 
-        if not nuevos:
-            return "No hay ingresos nuevos válidos para guardar.", 'info'
+        # Actualiza el acumulado en RAM para la siguiente fila de la misma cuenta
+        running_balances[cuenta_id] = new_balance
 
-        session.add_all(nuevos)
-        session.commit()
-        return f"Se guardaron {len(nuevos)} ingresos.", 'success'
+    if not nuevos:
+        return "No hay ingresos nuevos válidos para guardar.", 'info'
+
+    session.add_all(nuevos)
+    session.commit()
+    return f"Se guardaron {len(nuevos)} ingresos.", 'success'
     
-    except Exception as e:
-        session.rollback()
-        return f"Error al guardar los ingresos: {e}", 'danger'
+    # except Exception as e:
+    #     session.rollback()
+    #     return f"Error al guardar los ingresos: {e}", 'danger'
 
-    finally:
-        session.close()
+    # finally:
+    #     session.close()
 
 def save_wastes(df, file_id, sheet_name):
     session = Session()

@@ -51,7 +51,7 @@ def divisa_string_to_id():
     
     return divisa_dict
 
-def cat_incom_string_to_id():
+def cat_incom_string_to_id() -> dict:
     session = Session()
 
     consult_categoria = text("""
@@ -64,7 +64,7 @@ def cat_incom_string_to_id():
     
     return categoria_dict
 
-def cat_invest_string_to_id():
+def cat_invest_string_to_id() -> dict:
     session = Session()
 
     consult_categoria = text("""

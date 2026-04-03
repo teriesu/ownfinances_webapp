@@ -213,6 +213,9 @@ def create_app():
     from app.blueprints.valoracion import valoracion
     app.register_blueprint(valoracion)
 
+    from app.blueprints.incomings import incomings
+    app.register_blueprint(incomings)
+
     # Add direct route handlers for security redirects
     @app.route('/login', methods=['GET'])
     def login_redirect():
