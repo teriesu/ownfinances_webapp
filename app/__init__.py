@@ -1,9 +1,18 @@
+import os
+from dotenv import load_dotenv
+
+# Cargar las variables de entorno desde el archivo .env
+dotenv_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env')
+if os.path.exists(dotenv_path):
+    load_dotenv(dotenv_path=dotenv_path)
+else:
+    print(f"El archivo .env no se encontró en la ruta: {dotenv_path}")
+
 from .extensions import db 
 from flask_bootstrap import Bootstrap4
 from flask_migrate import Migrate
 from flask_wtf import CSRFProtect
 import platform
-from credentials import *
 from .extensions import db, limiter, login_manager
 from flask import Flask, redirect, request
 from flask_talisman import Talisman
@@ -55,28 +64,34 @@ def create_app():
     #creamos la app
     app = Flask(__name__)
 
-    host = HOST
-
-    if "microsoft" in platform.uname().release.lower():
+    # Determine database host
+    # Priority: DB_HOST env var > WSL detection > localhost
+    host = os.getenv("DB_HOST")
+    
+    # Only try WSL IP detection if DB_HOST is not set and we're in WSL
+    if not host and "microsoft" in platform.uname().release.lower():
         wsl_ip = get_windows_host_ip_from_wsl()
         if wsl_ip:
             host = wsl_ip
+    
+    # Default to localhost if no host is determined
+    if not host:
+        host = "localhost"
 
     # Asignar cadena de conexión final
-    print(f'Cadena de conexión final: postgresql+psycopg2://{USERNAME}:***@{host}:{PORT}/{DATABASE}')
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql+psycopg2://{USERNAME}:{PASSWORD}@{host}:{PORT}/{DATABASE}'
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql+psycopg2://{os.getenv("DB_USERNAME")}:{os.getenv("DB_PASSWORD")}@{host}:{os.getenv("DB_PORT", 5432)}/{os.getenv("DB_DATABASE")}'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     #Protección CSRF
-    app.secret_key = SECRET_KEY #llave secreta
-    app.config['SECURITY_ENABLED'] = SECURITY_ENABLED
-    app.config["SECURITY_CSRF_COOKIE_NAME"] = SECURITY_CSRF_COOKIE_NAME #nombre de la cookie de seguridad
-    app.config["WTF_CSRF_TIME_LIMIT"] = WTF_CSRF_TIME_LIMIT #Tiempo de validez de la cookie
-    app.config["SECURITY_CSRF_IGNORE_UNAUTH_ENDPOINTS"] = SECURITY_CSRF_IGNORE_UNAUTH_ENDPOINTS #Endponts sin seguridad
-    app.config["SECURITY_CSRF_PROTECT_MECHANISMS"] = SECURITY_CSRF_PROTECT_MECHANISMS
-    app.config["SECURITY_FRESHNESS_GRACE_PERIOD"] = SECURITY_FRESHNESS_GRACE_PERIOD  # Periodo de gracia de seguridad
-    app.config["SECURITY_ANONYMOUS_USER_DISABLED"] = SECURITY_ANONYMOUS_USER_DISABLED  # Permitir usuarios anónimos
-    app.config["WTF_CSRF_CHECK_DEFAULT"] = WTF_CSRF_CHECK_DEFAULT  # Requerido cuando CSRF_PROTECT_MECHANISMS está configurado
+    app.secret_key = os.getenv("SECRET_KEY") #llave secreta
+    app.config['SECURITY_ENABLED'] = os.getenv("SECURITY_ENABLED")
+    app.config["SECURITY_CSRF_COOKIE_NAME"] = os.getenv("SECURITY_CSRF_COOKIE_NAME") #nombre de la cookie de seguridad
+    app.config["WTF_CSRF_TIME_LIMIT"] = int(os.getenv("WTF_CSRF_TIME_LIMIT")) #Tiempo de validez de la cookie
+    app.config["SECURITY_CSRF_IGNORE_UNAUTH_ENDPOINTS"] = os.getenv("SECURITY_CSRF_IGNORE_UNAUTH_ENDPOINTS") #Endponts sin seguridad
+    app.config["SECURITY_CSRF_PROTECT_MECHANISMS"] = os.getenv("SECURITY_CSRF_PROTECT_MECHANISMS").split(',')
+    app.config["SECURITY_FRESHNESS_GRACE_PERIOD"] = datetime.timedelta(seconds=int(os.getenv("SECURITY_FRESHNESS_GRACE_PERIOD")))  # Periodo de gracia de seguridad
+    app.config["SECURITY_ANONYMOUS_USER_DISABLED"] = os.getenv("SECURITY_ANONYMOUS_USER_DISABLED")  # Permitir usuarios anónimos
+    app.config["WTF_CSRF_CHECK_DEFAULT"] = False  # Requerido cuando CSRF_PROTECT_MECHANISMS está configurado
     
     # Flask-Security configuration - more complete setup
     app.config["SECURITY_URL_PREFIX"] = None  # Don't use a prefix for security routes
@@ -221,5 +236,16 @@ def create_app():
         """Handle the security.login endpoint to prevent BuildError"""
         next_url = request.args.get('next', '/resume/')
         return redirect(f'/?next={next_url}')
+    
+    # Health check endpoint for Docker and monitoring
+    @app.route('/health')
+    def health_check():
+        """Health check endpoint to verify app and database connectivity"""
+        try:
+            # Try to execute a simple query to check database connection
+            db.session.execute(db.text('SELECT 1'))
+            return {'status': 'healthy', 'database': 'connected'}, 200
+        except Exception as e:
+            return {'status': 'unhealthy', 'database': 'disconnected', 'error': str(e)}, 503
 
     return app

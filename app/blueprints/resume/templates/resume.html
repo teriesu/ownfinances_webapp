@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
 <br><br>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link rel="stylesheet" href="{{ url_for('resume.static', filename='css/style.css') }}">
 <div class="container text-center">
-    <h1>Manipulación de formatos</h1>
+    <h1>Dashboard</h1>
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
@@ -14,6 +15,33 @@
         {% endif %}
     {% endwith %}
     <hr><br>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-header">Patrimonio actual</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ patrimonio }}</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">Liquidez actual</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ liquidez }}</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-header">Último movimiento</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ ultimo_movimiento }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="d-grid gap-2">
         <div>
             <a href="/resume/actualize_db" class="btn btn-personal my-btn">Actualizar información</a>
@@ -30,23 +58,19 @@
 
     <br><br>
 
-    <table id="maestroinsumos" class="table table-bordered  display nowrap" cellspacing="0">
-        <thead>
-            <tr>
-            <th>Patrimonio actual</th>
-            <th>Liquidez actual</th>
-            <th>Último movimiento</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>{{ patrimonio }}</td>
-                <td>{{ liquidez }}</td>
-                <td>{{ ultimo_movimiento }}</td>
-            </tr>
-
-        </tbody>
-    </table>
-
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    Expenses by Category
+                </div>
+                <div class="card-body">
+                    <canvas id="expensesChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+<script src="{{ url_for('resume.static', filename='js/resume.js') }}"></script>
+
 {% endblock %}

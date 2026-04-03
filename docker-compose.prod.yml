@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: finances_db_prod
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    networks:
+      - finances_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: 
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: finances_web_prod
+    restart: always
+    env_file:
+      - .env.prod
+    environment:
+      - DB_HOST=db
+      - FLASK_APP=app
+      - FLASK_ENV=production
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - finances_network
+    command: gunicorn --bind 0.0.0.0:8000 --workers 4 --timeout 120 "app:create_app()"
+
+volumes:
+  postgres_data_prod:
+
+networks:
+  finances_network:
+    driver: bridge

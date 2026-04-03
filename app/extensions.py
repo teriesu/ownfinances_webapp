@@ -1,3 +1,11 @@
+import os
+from dotenv import load_dotenv
+dotenv_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env')
+if os.path.exists(dotenv_path):
+    load_dotenv(dotenv_path=dotenv_path)
+else:
+    print(f"El archivo .env no se encontró en la ruta: {dotenv_path}")
+
 #Crear la base de datos de tipo SQLAlchemy
 from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()   
@@ -5,18 +13,24 @@ db = SQLAlchemy()
 #Crear el engine para consultas en la base de datos
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from credentials import *
 from .init_utils import get_windows_host_ip_from_wsl
 import platform
 
-host = HOST
+# Determine database host
+# Priority: DB_HOST env var > WSL detection > localhost
+host = os.getenv("DB_HOST")
 
-if "microsoft" in platform.uname().release.lower():
+# Only try WSL IP detection if DB_HOST is not set and we're in WSL
+if not host and "microsoft" in platform.uname().release.lower():
     wsl_ip = get_windows_host_ip_from_wsl()
     if wsl_ip:
         host = wsl_ip
 
-engine = create_engine(f'postgresql+psycopg2://{USERNAME}:{PASSWORD}@{host}:{PORT}/{DATABASE}')
+# Default to localhost if no host is determined
+if not host:
+    host = "localhost"
+
+engine = create_engine(f'postgresql+psycopg2://{os.getenv("DB_USERNAME")}:{os.getenv("DB_PASSWORD")}@{host}:{os.getenv("DB_PORT", 5432)}/{os.getenv("DB_DATABASE")}')
 Session = sessionmaker(bind=engine)
 
 # Creamos el limitador de solicitudes por endpoint

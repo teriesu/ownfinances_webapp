@@ -1,4 +1,48 @@
-venv
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Python
 credentials.py
-__pycache__
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Environment files
+*.env
+.env
+.env.prod
+!.env.example
+
+# JSON credentials
 *.json
+
+# Database
+*.db
+*.sqlite
+*.sql
+
+# Docker
+.dockerignore
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
