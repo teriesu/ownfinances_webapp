@@ -133,7 +133,7 @@ class Gdrive:
             spreadsheetId=file_id,
             range=sheet_name
         ).execute()
-        
+        print('resultado: ', result)
         # Obtiene los valores desde el resultado
         values = result.get('values', [])
         

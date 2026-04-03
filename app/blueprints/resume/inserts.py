@@ -97,60 +97,59 @@ def update_current_money(suma_por_medio_divisa, total_records_expected):
         tuple: (success: bool, message: str)
     """
     session = Session()
-    try:
+    # try:
         # Verificar que se procesaron todos los registros esperados
-        total_processed = sum(1 for key in suma_por_medio_divisa if suma_por_medio_divisa[key]['total'] > 0)
-        if total_processed != total_records_expected:
-            return False, f"Error: Se esperaban {total_records_expected} registros, pero solo se procesaron {total_processed} correctamente."
+        # total_processed = sum(1 for key in suma_por_medio_divisa if suma_por_medio_divisa[key]['total'] > 0)
+        # if total_processed != total_records_expected:
+        #     return False, f"Error: Se esperaban {total_records_expected} registros, pero solo se procesaron {total_processed} correctamente."
         
         # Obtener nombres de medios de pago y divisas para mensajes más legibles
-        medios_dict = medio_id_to_string()  # {id: nombre}
-        divisas_dict = divisa_id_to_string()  # {id: nombre}
-        
-        last_balance = consults.get_last_balance_by_account_detailed()
-        nuevos_saldos = []
-        
-        # Verificar que cada combinación medio-divisa tenga una cuenta correspondiente
-        unmatched_combinations = []
-        
-        for medio_id, divisa_id in suma_por_medio_divisa:
-            found_match = False
-            
-            # Obtener nombres legibles
-            medio_nombre = medios_dict.get(medio_id, f"ID:{medio_id}")
-            divisa_nombre = divisas_dict.get(divisa_id, f"ID:{divisa_id}")
-            
-            for balance_account in last_balance: 
-                if medio_id in balance_account['medios_pago'] and divisa_id == balance_account['divisa']:
-                    found_match = True
-                    nuevo_saldo = SaldoCuenta(
-                        cuenta_id=balance_account['cuenta_id'],
-                        saldo=balance_account['saldo'] - suma_por_medio_divisa[(medio_id, divisa_id)]['total'],
-                        fecha_movimiento=suma_por_medio_divisa[(medio_id, divisa_id)]['last_fecha'],
-                        descripcion=suma_por_medio_divisa[(medio_id, divisa_id)]['last_desc']
-                    )
-                    nuevos_saldos.append(nuevo_saldo)
-                    break
-            
-            if not found_match:
-                unmatched_combinations.append(f"Medio: {medio_nombre} (ID:{medio_id}), Divisa: {divisa_nombre} (ID:{divisa_id})")
-        
-        # Si hay combinaciones sin cuenta correspondiente, no proceder
-        if unmatched_combinations:
-            error_msg = f"Error: No se encontraron cuentas para las siguientes combinaciones:\n" + "\n".join(unmatched_combinations)
-            return False, error_msg
-        
-        # Si llegamos aquí, todo está bien para proceder
-        session.add_all(nuevos_saldos)
-        session.commit()
-        return True, f"Se actualizaron {len(nuevos_saldos)} saldos de cuenta correctamente."
-        
-    except Exception as e:
-        session.rollback()
-        return False, f"Error al actualizar saldos: {e}"
-    finally:
-        session.close()
+    medios_dict = medio_id_to_string()  # {id: nombre}
+    divisas_dict = divisa_id_to_string()  # {id: nombre}
     
+    last_balance = consults.get_last_balance_by_account_detailed()
+    nuevos_saldos = []
+    
+    # Verificar que cada combinación medio-divisa tenga una cuenta correspondiente
+    unmatched_combinations = []
+    
+    for medio_id, divisa_id in suma_por_medio_divisa:
+        found_match = False
+        
+        # Obtener nombres legibles
+        medio_nombre = medios_dict.get(medio_id, f"ID:{medio_id}")
+        divisa_nombre = divisas_dict.get(divisa_id, f"ID:{divisa_id}")
+        
+        for balance_account in last_balance: 
+            if medio_id in balance_account['medios_pago'] and divisa_id == balance_account['divisa']:
+                found_match = True
+                nuevo_saldo = SaldoCuenta(
+                    cuenta_id=balance_account['cuenta_id'],
+                    saldo=balance_account['saldo'] - suma_por_medio_divisa[(medio_id, divisa_id)]['total'],
+                    fecha_movimiento=suma_por_medio_divisa[(medio_id, divisa_id)]['last_fecha'],
+                    descripcion=suma_por_medio_divisa[(medio_id, divisa_id)]['last_desc']
+                )
+                nuevos_saldos.append(nuevo_saldo)
+                break
+        
+        if not found_match:
+            unmatched_combinations.append(f"Medio: {medio_nombre} (ID:{medio_id}), Divisa: {divisa_nombre} (ID:{divisa_id})")
+    
+    # Si hay combinaciones sin cuenta correspondiente, no proceder
+    if unmatched_combinations:
+        error_msg = f"Error: No se encontraron cuentas para las siguientes combinaciones:\n" + "\n".join(unmatched_combinations)
+        return False, error_msg
+    
+    # Si llegamos aquí, todo está bien para proceder
+    session.add_all(nuevos_saldos)
+    session.commit()
+    return True, f"Se actualizaron {len(nuevos_saldos)} saldos de cuenta correctamente."
+    
+    # except Exception as e:
+    #     session.rollback()
+    #     return False, f"Error al actualizar saldos: {e}"
+    # finally:
+        # session.close()
 
 def save_incomings(df, file_id, sheet_name):
     session = Session()
@@ -171,6 +170,7 @@ def save_incomings(df, file_id, sheet_name):
         df['Monto'] = df['Monto'].apply(convert_currency_to_float).astype(float)
         df['Categoría'] = df['Categoría'].map(cat_incom_string_to_id())
         df['Cuenta'] = df['Cuenta'].map(cuenta_string_to_id())
+        df['Fecha'] = df['Fecha'].apply(lambda x: datetime.datetime.strptime(x, '%d/%m/%Y').date())
 
         # Ordena para que el saldo vaya “acumulando” por cuenta
         df.sort_values(['Cuenta', 'Fecha'], inplace=True)
@@ -233,7 +233,9 @@ def save_wastes(df, file_id, sheet_name):
         df['Categoría'] = df['Categoría'].map(cat_wast_string_to_id())
         df['Médio de pago'] = df['Médio de pago'].map(medio_string_to_id())
         df['Divisa'] = df['Divisa'].map(divisa_string_to_id())
+        df['Fecha'] = df['Fecha'].apply(lambda x: datetime.datetime.strptime(x, '%d/%m/%Y').date())
         
+        print(df.head())
         last_waste_id = consults.get_last_format_register(file_id, hoja_tabla[sheet_name])
         start_index = last_waste_id + 1 if last_waste_id is not None else 0
         
@@ -320,11 +322,11 @@ def save_wastes(df, file_id, sheet_name):
             records_processed += 1
         
         # FASE 3: VALIDAR ACTUALIZACIÓN DE SALDOS
-        balance_update_success, balance_message = update_current_money(suma_por_medio_divisa, records_processed)
+        # balance_update_success, balance_message = update_current_money(suma_por_medio_divisa, records_processed)
         
-        if not balance_update_success:
-            # Si no se pueden actualizar los saldos, abortar todo
-            return f"Error en actualización de saldos: {balance_message}", 'danger'
+        # if not balance_update_success:
+        #     # Si no se pueden actualizar los saldos, abortar todo
+        #     return f"Error en actualización de saldos: {balance_message}", 'danger'
         
         # FASE 4: COMMIT FINAL - Solo si todo está correcto
         # Primero guardar bienes (para obtener IDs)
@@ -349,7 +351,7 @@ def save_wastes(df, file_id, sheet_name):
         success_msg += f" {len(nuevos_gastos)} gastos guardados\n"
         if nuevos_bienes:
             success_msg += f"- {len(nuevos_bienes)} bienes registrados\n"
-        success_msg += f"- {balance_message}"
+        # success_msg += f"- {balance_message}"
         
         return success_msg, 'success'
 
@@ -375,6 +377,7 @@ def save_investments(df, file_id, sheet_name):
         
         df['Monto'] = df['Monto'].apply(convert_currency_to_float)
         df['Categoría'] = df['Categoría'].map(cat_invest_string_to_id())
+        df['Fecha'] = df['Fecha'].apply(lambda x: datetime.datetime.strptime(x, '%d/%m/%Y').date())
 
         last_investment_id = consults.get_last_format_register(file_id, hoja_tabla[sheet_name])
         start_index = last_investment_id + 1 if last_investment_id is not None else 0
