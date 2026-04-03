@@ -1,32 +1,58 @@
 {% extends 'base.html' %}
 {% block content %}
     <link rel="stylesheet" href="{{ url_for('wastes.static', filename='css/style.css') }}">
-    <div class = head-container>
-        <h1>Resumen de invesiones</h1>
-        <div class="row">
-            <div class="col">
-                <div class="form-group">
-                    <label for="start-date" class="form-control-label">Fecha inicial:</label>
-                    <input type="date" id="start-date" name="start-date" class="form-control">
-                </div>
-            </div>
-            <div class="col">
-                <div class="form-group">
-                    <label for="end-date" class="form-control-label">Fecha final:</label>
-                    <input type="date" id="end-date" name="end-date" class="form-control">
+    <div class="head-container">
+        <h1>Resumen de inversiones</h1>
+        
+        <div class="filters-container">
+            <div class="filter-card">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="start-date" class="form-control-label">
+                                <i class="bi bi-calendar-event"></i> Fecha inicial
+                            </label>
+                            <input type="date" id="start-date" name="start-date" class="form-control modern-input">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="end-date" class="form-control-label">
+                                <i class="bi bi-calendar-check"></i> Fecha final
+                            </label>
+                            <input type="date" id="end-date" name="end-date" class="form-control modern-input">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     
         <div class="row">
-            <div class="col d-flex justify-content-center">
-                <div id="my-table"></div>
+            <div class="col-lg-7 col-xl-8 mb-4">
+                <div class="table-card">
+                    <div class="table-card-header">
+                        <h5 class="table-card-title">
+                            <i class="bi bi-table"></i> Detalle de Inversiones
+                        </h5>
+                    </div>
+                    <div class="table-wrapper">
+                        <div id="my-table"></div>
+                    </div>
+                </div>
             </div>
-            <div class="col d-flex justify-content-center align-items-center">
-                <canvas id="myChart"></canvas>
+            <div class="col-lg-5 col-xl-4 mb-4">
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <h5 class="chart-card-title">
+                            <i class="bi bi-pie-chart"></i> Distribución por Categoría
+                        </h5>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="myChart"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
-        <br>
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Totales</h5>

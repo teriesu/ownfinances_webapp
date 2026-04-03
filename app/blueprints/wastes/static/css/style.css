@@ -1,60 +1,376 @@
 .container {
-    padding: 0px;
-    padding-top: 0px;
-    max-width: 800px;
+    padding: 20px;
+    max-width: 1200px;
     margin: auto;
 }
-.gridjs-table tr {
-    border-top: 1px solid #45A7F7;
-    text-align: center;
-    /* background-color: purple !important; */
+
+.filters-container {
+    margin-bottom: 30px;
+}
+
+.filter-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px 28px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.filter-card:hover {
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+}
+
+.modern-input {
+    border: 2px solid #e0e6ed;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: #f8f9fa;
+}
+
+.modern-input:focus {
+    border-color: #2faa5d;
+    background-color: white;
+    box-shadow: 0 0 0 4px rgba(47, 170, 93, 0.1);
+    outline: none;
+}
+
+.modern-input:hover {
+    border-color: #2faa5d;
+    background-color: white;
+}
+
+.form-control-label {
+    font-weight: 600;
     color: #16173B;
+    font-size: 0.95rem;
+    letter-spacing: 0.3px;
+    margin-bottom: 8px;
+    display: block;
 }
-.gridjs-thead{
-    background-color: #2faa5d !important;
-    color: #16173B !important;
+
+.form-control-label i {
+    margin-right: 6px;
+    color: #2faa5d;
 }
-.table td{
-    border-top: 1px solid #2faa5d !important;
+
+.gridjs-table tr {
+    border-top: 1px solid rgba(69, 167, 247, 0.2);
+    text-align: center;
+    color: #16173B;
+    transition: background-color 0.2s ease;
 }
+
+.gridjs-table tr:hover {
+    background-color: rgba(47, 170, 93, 0.05);
+}
+
+.gridjs-thead {
+    background: linear-gradient(135deg, #2faa5d 0%, #25d366 100%) !important;
+    color: white !important;
+    font-weight: 600;
+}
+
+.table td {
+    border-top: 1px solid rgba(47, 170, 93, 0.15) !important;
+    padding: 12px 16px !important;
+}
+
 .table-striped tbody tr:nth-of-type(odd) {
-    background-color: rgba(74, 225, 216,.1);
+    background-color: rgba(74, 225, 216, 0.05);
 }
+
+.table-striped tbody tr:hover {
+    background-color: rgba(47, 170, 93, 0.08);
+}
+
 .gridjs-table th {
     text-align: center;
-    color: #16173B;
+    color: white;
 }
 
-.head-container{
-    margin-top: 30px;
+.head-container {
+    margin-top: 40px;
     margin-left: auto;
     margin-right: auto;
-    width: 90%;
+    width: 95%;
+    max-width: 1600px;
 }
 
-table thead{
-background: linear-gradient(to right, #2faa5d, #18CA5B); 
-color:white;
+.head-container h1 {
+    color: #16173B;
+    font-weight: 700;
+    margin-bottom: 30px;
+    font-size: 2.5rem;
+    text-align: center;
 }
-table.dataTable {
+
+.head-container .row {
+    margin-bottom: 0;
+}
+
+.head-container .form-group {
+    margin-bottom: 0;
+}
+
+.dashboard-row {
+    display: flex;
+    gap: 0;
+    margin-bottom: 30px;
+}
+
+.table-card, .chart-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.table-card:hover, .chart-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+}
+
+.table-card-header, .chart-card-header {
+    background: linear-gradient(135deg, #2faa5d 0%, #25d366 100%);
+    padding: 16px 24px;
+    border-bottom: none;
+}
+
+.table-card-title, .chart-card-title {
+    color: white;
+    font-weight: 600;
+    font-size: 1.1rem;
     margin: 0;
 }
-/* Reduce vertical spacing */
+
+.table-card-title i, .chart-card-title i {
+    margin-right: 8px;
+}
+
+.table-wrapper {
+    padding: 20px;
+    overflow-x: auto;
+    flex: 1;
+    min-height: 500px;
+    max-height: 700px;
+    overflow-y: auto;
+}
+
+.chart-wrapper {
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    min-height: 500px;
+}
+
+table thead {
+    background: linear-gradient(135deg, #2faa5d 0%, #25d366 100%);
+    color: white;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+table thead th {
+    border: none !important;
+    padding: 14px 12px !important;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+table.dataTable {
+    margin: 0 !important;
+    width: 100% !important;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+table.modern-table {
+    font-size: 0.95rem;
+}
+
+table.modern-table tbody tr {
+    border-bottom: 1px solid rgba(47, 170, 93, 0.1);
+}
+
+table.modern-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+div.dataTables_wrapper {
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+div.dataTables_wrapper div.dataTables_length {
+    padding: 0 0 15px 0;
+}
+
+div.dataTables_wrapper div.dataTables_length select {
+    border: 2px solid #e0e6ed;
+    border-radius: 8px;
+    padding: 6px 30px 6px 10px;
+    margin: 0 8px;
+    transition: all 0.3s ease;
+}
+
+div.dataTables_wrapper div.dataTables_length select:focus {
+    border-color: #2faa5d;
+    box-shadow: 0 0 0 3px rgba(47, 170, 93, 0.1);
+    outline: none;
+}
+
+div.dataTables_wrapper div.dataTables_filter {
+    padding: 0 0 15px 0;
+}
+
+div.dataTables_wrapper div.dataTables_filter input {
+    border: 2px solid #e0e6ed;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-left: 8px;
+    transition: all 0.3s ease;
+}
+
+div.dataTables_wrapper div.dataTables_filter input:focus {
+    border-color: #2faa5d;
+    box-shadow: 0 0 0 3px rgba(47, 170, 93, 0.1);
+    outline: none;
+}
 
 div.dataTables_wrapper div.dataTables_info {
-    padding-top: 0px;
+    padding-top: 15px;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+div.dataTables_wrapper div.dataTables_paginate {
+    padding-top: 15px;
+}
+
+div.dataTables_wrapper div.dataTables_paginate .paginate_button {
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 6px 12px;
+    margin: 0 2px;
+    transition: all 0.2s ease;
+    background: white;
+    color: #16173B !important;
+}
+
+div.dataTables_wrapper div.dataTables_paginate .paginate_button:hover {
+    background: rgba(47, 170, 93, 0.1);
+    border-color: #2faa5d;
+    color: #2faa5d !important;
+}
+
+div.dataTables_wrapper div.dataTables_paginate .paginate_button.current {
+    background: linear-gradient(135deg, #2faa5d 0%, #25d366 100%) !important;
+    border-color: #2faa5d;
+    color: white !important;
+}
+
+div.dataTables_wrapper div.dataTables_paginate .paginate_button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td {
-    padding: 4px 8px 4px 8px;
+    padding: 12px 10px;
+    vertical-align: middle;
+    border-top: none !important;
 }
-/* End Reduce vertical spacing */
+
+.table>tbody>tr {
+    transition: all 0.2s ease;
+}
+
+.table>tbody>tr:hover {
+    background-color: rgba(47, 170, 93, 0.05);
+}
 
 .bold-row {
-font-weight: bold;
-}    
+    font-weight: 600;
+}
 
 #myChart {
-    width: 650px !important;
-    height: 650px !important;
+    width: 100% !important;
+    max-width: 450px !important;
+    height: auto !important;
+    aspect-ratio: 1;
+    margin: 0 auto;
+}
+
+.card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: white;
+    margin: 10px 0;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+}
+
+.card-title {
+    color: #16173B;
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+}
+
+.card-text {
+    font-size: 1.1rem;
+    color: #4a5568;
+}
+
+.card-text span {
+    font-weight: 700;
+    color: #2faa5d;
+    font-size: 1.3rem;
+}
+
+.dt-buttons .dt-button {
+    background: linear-gradient(135deg, #45a6f7 0%, #3c8dcf 100%);
+    border: none;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(69, 166, 247, 0.3);
+    margin-bottom: 15px;
+}
+
+.dt-buttons .dt-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(69, 166, 247, 0.4);
+}
+
+@media (max-width: 991px) {
+    .dashboard-row {
+        flex-direction: column;
+    }
+    
+    .chart-wrapper {
+        min-height: 400px;
+    }
+    
+    .table-wrapper {
+        min-height: 400px;
+    }
 }

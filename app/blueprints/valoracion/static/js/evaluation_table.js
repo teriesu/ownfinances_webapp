@@ -32,7 +32,7 @@ function addProperty() {
     let weightCell = footRows[0].insertCell(index);
     weightCell.innerHTML = '<input type="text" name="weight' + index + '" onchange="checkWeights()">';
     let minmaxCell = footRows[1].insertCell(index);
-    minmaxCell.innerHTML = '<select name="minmax' + index + '"><option value="min">Min</option><option value="max">Max</option></select>';
+    minmaxCell.innerHTML = '<select name="minmax' + index + '"><option value="min">Minimizar</option><option value="max">Maximizar</option></select>';
 }
 
 function removeObject() {

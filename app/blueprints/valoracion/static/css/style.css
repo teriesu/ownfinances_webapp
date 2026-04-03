@@ -1,32 +1,65 @@
-table thead{
-background: linear-gradient(to right, #2faa5d, #18CA5B); 
-color:white;
+table thead {
+    background: linear-gradient(135deg, #2faa5d 0%, #25d366 100%);
+    color: white;
+    font-weight: 600;
 }
+
+table thead th {
+    border-bottom: none;
+    padding: 16px;
+}
+
 table.dataTable {
     margin: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    background: white;
 }
-/* Reduce vertical spacing */
+
+div.dataTables_wrapper {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
 
 div.dataTables_wrapper div.dataTables_info {
-    padding-top: 0px;
+    padding-top: 12px;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+div.dataTables_wrapper div.dataTables_paginate {
+    padding-top: 12px;
 }
 
 .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td {
-    padding: 4px 8px 4px 8px;
+    padding: 12px 16px;
+    vertical-align: middle;
 }
-/* End Reduce vertical spacing */
+
+.table>tbody>tr {
+    transition: all 0.2s ease;
+}
+
+.table>tbody>tr:hover {
+    background-color: rgba(47, 170, 93, 0.05);
+}
 
 .bold-row {
-font-weight: bold;
-}    
+    font-weight: 600;
+}
 
 .table-responsive {
     overflow-x: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .table th, .table td {
     vertical-align: middle;
-    min-width: 120px; /* Asegura un ancho mínimo para cada celda */
+    min-width: 120px;
 }
 
 .table th:first-child, .table td:first-child {
@@ -34,22 +67,32 @@ font-weight: bold;
     left: 0;
     background-color: white;
     z-index: 1;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
 }
 
-/* Estilo para los input dentro de la tabla */
 .table input[type="text"],
 .table select {
-    border: 0;
-    background-color: rgba(0,0,0,0);
+    border: 2px solid transparent;
+    background-color: rgba(0, 0, 0, 0);
     width: 100%;
     box-sizing: border-box;
     text-align: center;
+    transition: all 0.3s ease;
+    border-radius: 6px;
+    padding: 6px 10px;
 }
 
 .table input[type="text"]:focus,
 .table select:focus {
     outline: none;
-    background-color: rgba(0,0,0,0.05);
+    background-color: rgba(47, 170, 93, 0.08);
+    border-color: #2faa5d;
+    box-shadow: 0 0 0 3px rgba(47, 170, 93, 0.1);
+}
+
+.table input[type="text"]:hover,
+.table select:hover {
+    background-color: rgba(47, 170, 93, 0.03);
 }
 
 .table select {

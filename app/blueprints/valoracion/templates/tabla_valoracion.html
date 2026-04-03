@@ -14,8 +14,8 @@
                 <thead>
                     <tr>
                         <th>Nombre</th>
-                        <th id="property1"><input type="text" name="object1" placeholder = "Propiedad 1"></th>
-                        <th id="property2"><input type="text" name="object1" placeholder = "Propiedad 2"></th>
+                        <th id="property1"><input type="text" name="object1" placeholder = "Propiedad 1 (e.g. Precio)"></th>
+                        <th id="property2"><input type="text" name="object1" placeholder = "Propiedad 2 (e.g. Calidad)"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -37,26 +37,26 @@
                         <td><input type="text" name="weight2" onchange="checkWeights()"></td>
                     </tr>
                     <tr>
-                        <td>Min/Max</td>
-                        <td><select name="minmax1"><option value="min">Min</option><option value="max">Max</option></select></td>
-                        <td><select name="minmax2"><option value="min">Min</option><option value="max">Max</option></select></td>
+                        <td>Minimizar/Maximizar</td>
+                        <td><select name="minmax1"><option value="min">Minimizar</option><option value="max">Maximizar</option></select></td>
+                        <td><select name="minmax2"><option value="min">Minimizar</option><option value="max">Maximizar</option></select></td>
                     </tr>
                 </tfoot>
             </table>
         </div>
-
+        <br>
         <div class="btn-group" role="group" aria-label="Table Controls">
             <button type="button" class="btn btn-success" onclick="addProperty()">Añadir Propiedad</button>
             <button type="button" class="btn btn-danger" onclick="removeProperty()">Eliminar Propiedad</button>
         </div>
         <br><br>
         <div class="btn-group" role="group" aria-label="Table Controls">
-            <button type="button" class="btn btn-success" onclick="addObject()">Añadir Objeto</button>
-            <button type="button" class="btn btn-danger" onclick="removeObject()">Eliminar Objeto</button>
+            <button type="button" class="btn btn-success" onclick="addObject()">Añadir Alternativa</button>
+            <button type="button" class="btn btn-danger" onclick="removeObject()">Eliminar Alternativa</button>
         </div>
         <br><br>
 
-        <button type="submit" class="btn btn-personal">Enviar</button>
+        <button type="submit" class="btn btn-personal">Calcular</button>
     </form>
 
 </div>
