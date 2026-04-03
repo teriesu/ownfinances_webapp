@@ -2,6 +2,7 @@
 venv/
 env/
 ENV/
+.venv/
 
 # Python
 credentials.py
@@ -10,6 +11,10 @@ __pycache__/
 *$py.class
 *.so
 .Python
+
+# uv
+uv.lock
+.python-version.bak
 
 # Environment files
 *.env

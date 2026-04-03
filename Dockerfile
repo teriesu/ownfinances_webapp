@@ -3,7 +3,7 @@ FROM python:3.10-slim
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies and uv
 RUN apt-get update && apt-get install -y \
     gcc \
     postgresql-client \
@@ -17,11 +17,16 @@ RUN sed -i '/es_CO.UTF-8/s/^# //g' /etc/locale.gen && \
 ENV LANG es_CO.UTF-8
 ENV LC_ALL es_CO.UTF-8
 
-# Copy requirements first for better caching
-COPY requirements.txt .
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy dependency files first for better caching
+COPY pyproject.toml .
+COPY .python-version .
+
+# Install Python dependencies with uv
+# Using --system to install in the container's Python (not a venv)
+RUN uv pip install --system -r pyproject.toml
 
 # Copy application code
 COPY . .
